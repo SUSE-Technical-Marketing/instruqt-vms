@@ -1,4 +1,4 @@
-install_ingress_nginx() {
+k8s_install_ingress_nginx() {
   echo "Installing Ingress NGINX..."
   helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
   helm repo update

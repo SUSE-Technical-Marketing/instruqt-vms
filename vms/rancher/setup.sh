@@ -17,7 +17,7 @@ do
   . "${file}"
 done
 
-install_tooling
+install_tooling "${K9S_VERSION}"
 echo ">> Increase limits"
 increase_limits
 echo ">> Setup k3s"
