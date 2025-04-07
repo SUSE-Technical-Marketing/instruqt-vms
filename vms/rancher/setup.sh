@@ -17,6 +17,9 @@ do
   . "${file}"
 done
 
+install_tooling
+echo ">> Increase limits"
+increase_limits
 echo ">> Setup k3s"
 k3s_create_cluster "${K3S_VERSION}" "rancher-master"
 k3s_copy_kubeconfig
