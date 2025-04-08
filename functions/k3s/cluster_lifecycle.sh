@@ -5,8 +5,9 @@
 # Create a K3s cluster
 # Arguments:
 #   K3s version
+#   Node name
 # Examples:
-#   k3s_create_cluster "v1.23"
+#   k3s_create_cluster "v1.23" "rancher-master"
 #######################################
 k3s_create_cluster() {
   local version=$1

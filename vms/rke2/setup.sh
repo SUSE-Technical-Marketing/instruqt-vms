@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -exuo pipefail
+set -euo pipefail
 
 # Check in which directory the script is running
 # This is important to know because the script will be sourced in the vms directory
@@ -22,12 +22,9 @@ done
 install_tooling "${K9S_VERSION}"
 echo ">> Increase limits"
 increase_limits
-echo ">> Setup k3s"
-k3s_create_cluster "${K3S_VERSION}" "rancher-master"
-k3s_copy_kubeconfig
-echo ">> Install Ingress Nginx"
-k8s_install_ingress_nginx
+echo ">> Setup RKE2"
+rke2_create_cluster "${RKE2_VERSION}" "rke2-master"
+rke2_copy_kubeconfig
 echo ">> Install cert-manager"
 k8s_install_certmanager "${CERTMANAGER_VERSION}"
 k8s_create_letsencryptclusterissuer "nginx" "${LETSENCRYPT_EMAIL_ADDRESS}"
-
