@@ -13,7 +13,12 @@ rke2_create_cluster() {
     local nodename=$2
 
     echo 'Installing RKE2...'
-    curl -sfL https://get.rke2.io | INSTALL_RKE2_VERSION="${version}" RKE2_KUBECONFIG_MODE="644" RKE2_NODE_NAME="${nodename}" sh -
+    mkdir -p /etc/rancher/rke2
+    cat <<EOF > /etc/rancher/rke2/config.yaml
+write-kubeconfig-mode: "644"
+node-name: "${nodename}"
+EOF
+    curl -sfL https://get.rke2.io | INSTALL_RKE2_VERSION="${version}" sh -
 
     echo 'Configuring RKE2 service...'
     systemctl enable rke2-server.service
