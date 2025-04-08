@@ -14,13 +14,9 @@ k8s_install_certmanager() {
   echo 'Installing cert-manager...'
   helm repo add jetstack https://charts.jetstack.io
   helm repo update
-  kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/${version}/cert-manager.crds.yaml
-  if [ $? -ne 0 ]; then
-    echo "Failed to install cert-manager CRDs"
-    exit 1
-  fi
   helm upgrade --install cert-manager jetstack/cert-manager \
     --namespace cert-manager --create-namespace \
+    --set crds.enabled=true \
     --version ${version}
   if [ $? -ne 0 ]; then
     echo "Failed to install cert-manager"
@@ -78,8 +74,8 @@ EOF
     echo "Failed to create Let's Encrypt cluster issuer"
     exit 1
   fi
-  sleep 5
-  while kubectl get clusterissuers -o json | jq -e '.items[] | select(.status.conditions[] | select(.type == "Ready" and .status != "True"))' > /dev/null; do
-    sleep 1
-  done
+
+  # Wait for the cluster issuers to be ready
+  kubectl wait --for=condition=Ready clusterissuer/letsencrypt-staging --timeout=60s
+  kubectl wait --for=condition=Ready clusterissuer/letsencrypt-prod --timeout=60s
 }
