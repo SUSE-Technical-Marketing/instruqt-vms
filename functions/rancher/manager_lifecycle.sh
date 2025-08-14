@@ -65,7 +65,6 @@ rancherprime_install_withcertmanagerclusterissuer() {
   echo "Waiting for Rancher web app to be running with a valid certificate..."
   if [ "$hostname" == "rancher.test.host" ]; then
     echo "Skipping certificate validation for hostname ${hostname}"
-    continue
   else
     kubectl wait --for=condition=Ready --timeout=300s certificate -n cattle-system rancher-tls
   fi
