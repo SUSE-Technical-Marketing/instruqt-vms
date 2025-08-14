@@ -60,7 +60,7 @@ setup_env() {
 
 download() {
     info 'Download scripts'
-    curl -fSsL -o ${GIT_REPO_NAME}.zip https://github.com/SUSE-Technical-Marketing/${GIT_REPO_NAME}/archive/${GIT_REVISION}.tar.gz
+    curl -fSsL -o ${GIT_REPO_NAME}.tar.gz https://github.com/SUSE-Technical-Marketing/${GIT_REPO_NAME}/archive/${GIT_REVISION}.tar.gz
     if [ $? -ne 0 ]; then
         fatal "Failed to download ${GIT_REPO_NAME} from ${GIT_REVISION}"
     fi
