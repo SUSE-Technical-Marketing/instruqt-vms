@@ -107,11 +107,11 @@ register() {
   if [ "$ID_LIKE" != "suse" ]; then
     info 'No need to register, not a SUSE system'
     continue
-  elif [ -z "$REG_CODE" ]; then
-    fatal 'REG_CODE is not set, please provide a valid registration code'
   elif [ "$ID" == "sles" ]; then
     info 'SUSE Linux Enterprise Server detected'
-    registercloudguest -r "$REG_CODE" -e "$INSTRUQT_SCC_EMAIL" || fatal 'Failed to register SUSE Linux Enterprise Server'
+    registercloudguest --force-new || fatal 'Failed to register SUSE Linux Enterprise Server'
+  elif [ -z "$REG_CODE" ]; then
+    fatal 'REG_CODE is not set, please provide a valid registration code'
   elif [ "$ID_LIKE" == "suse" ] && ( [ "$VARIANT_ID" == "sle-micro" ] || [ "$ID" == "sle-micro" ]); then
     info 'SUSE MicroOS detected'
     transactional-update register -r "$REG_CODE" -e "$INSTRUQT_SCC_EMAIL" || fatal 'Failed to register SUSE MicroOS'
