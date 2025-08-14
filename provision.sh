@@ -33,13 +33,6 @@ fatal() {
   exit 1
 }
 
-verify_system() {
-  info 'Verify system requirements'
-  if ! command -v jq &> /dev/null; then
-    fatal 'jq is not installed in the machine'
-  fi
-}
-
 setup_env() {
   info 'Setup variables'
   case "$1" in
@@ -113,7 +106,6 @@ register() {
 }
 
 {
-  verify_system
   setup_env "$@"
   download
   cleanup
