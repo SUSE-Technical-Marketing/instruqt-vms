@@ -59,24 +59,27 @@ setup_env() {
 }
 
 download() {
-  info 'Download scripts'
-  curl -fSsL -o ${GIT_REPO_NAME}.zip https://github.com/SUSE-Technical-Marketing/${GIT_REPO_NAME}/archive/${GIT_REVISION}.zip
-  unzip -q -o ${GIT_REPO_NAME}.zip
-  mkdir -p ${OUTPUT_FOLDER}
-  if [ -d ${OUTPUT_FOLDER}/scripts ]; then
-    warn "Output folder ${OUTPUT_FOLDER}/functions already exists, removing it"
-    rm -rf ${OUTPUT_FOLDER}/functions
-    rm -rf ${OUTPUT_FOLDER}/vms
-    rm -rf ${OUTPUT_FOLDER}/env
-  fi
-  mv ${GIT_REPO_NAME}-${GIT_FOLDER}/functions ${OUTPUT_FOLDER}
-  mv ${GIT_REPO_NAME}-${GIT_FOLDER}/vms ${OUTPUT_FOLDER}
-  mv ${GIT_REPO_NAME}-${GIT_FOLDER}/env ${OUTPUT_FOLDER}
+    info 'Download scripts'
+    curl -fSsL -o ${GIT_REPO_NAME}.zip https://github.com/SUSE-Technical-Marketing/${GIT_REPO_NAME}/archive/${GIT_REVISION}.tar.gz
+    if [ $? -ne 0 ]; then
+        fatal "Failed to download ${GIT_REPO_NAME} from ${GIT_REVISION}"
+    fi
+    tar -xzf ${GIT_REPO_NAME}.tar.gz
+    mkdir -p ${OUTPUT_FOLDER}
+    if [ -d ${OUTPUT_FOLDER}/scripts ]; then
+        warn "Output folder ${OUTPUT_FOLDER}/functions already exists, removing it"
+        rm -rf ${OUTPUT_FOLDER}/functions
+        rm -rf ${OUTPUT_FOLDER}/vms
+        rm -rf ${OUTPUT_FOLDER}/env
+    fi
+    mv ${GIT_REPO_NAME}-${GIT_FOLDER}/functions ${OUTPUT_FOLDER}
+    mv ${GIT_REPO_NAME}-${GIT_FOLDER}/vms ${OUTPUT_FOLDER}
+    mv ${GIT_REPO_NAME}-${GIT_FOLDER}/env ${OUTPUT_FOLDER}
 }
 
 cleanup() {
   info 'Clean-up'
-  rm -f ${GIT_REPO_NAME}.zip
+  rm -f ${GIT_REPO_NAME}.tar.gz
   rm -rf ${GIT_REPO_NAME}-${GIT_FOLDER}
 }
 
