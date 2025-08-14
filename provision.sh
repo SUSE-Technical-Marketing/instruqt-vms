@@ -7,12 +7,12 @@
 #   ENV_VAR=... ./setup.sh
 #
 # Examples:
-#   Downloading scripts from a "develop" branch in a temp local folder "temp":
-#     curl -sfL https://raw.githubusercontent.com/SUSE/lab-setup/feature/init-solution/scripts/setup.sh | GIT_REVISION=refs/heads/develop sh -s -- -o temp
+#   Downloading scripts from a "main" branch in a temp local folder "temp":
+#     curl -sfL https://raw.githubusercontent.com/SUSE-Technical-Marketing/instruqt-vms/main/provision.sh | REG_CODE="SCC_REG_CODE" MACHINE="rancher" sh -
 #   Downloading scripts from a specific revision "d8b7564fbf91473074e86b598ae06c7e4e522b9f" in the default local folder:
-#     curl -sfL https://raw.githubusercontent.com/SUSE/lab-setup/feature/init-solution/scripts/setup.sh | GIT_REVISION=d8b7564fbf91473074e86b598ae06c7e4e522b9f sh -
+#     curl -sfL https://raw.githubusercontent.com/SUSE-Technical-Marketing/instruqt-vms/feature/init-solution/scripts/setup.sh | GIT_REVISION=d8b7564fbf91473074e86b598ae06c7e4e522b9f sh -
 #   Testing locally the setup script:
-#     GIT_REVISION=refs/heads/feature/init-solution ./lab-setup/scripts/setup.sh -o temp
+#     GIT_REVISION=refs/heads/feature/init-solution ./instruqt-vms/scripts/setup.sh -o temp
 #
 # Environment variables:
 #   - GIT_REVISION
@@ -83,9 +83,29 @@ cleanup() {
   rm -rf ${GIT_REPO_NAME}-${GIT_FOLDER}
 }
 
+provision() {
+    info 'Provisioning script starting'
+    REG_CODE=${REG_CODE:-''}
+    if [ -z "$REG_CODE" ]; then
+        fatal 'REG_CODE is not set, please provide a valid registration code'
+    fi
+
+    export REG_CODE
+
+    MACHINE=${MACHINE:-''}
+    if [ -z "$MACHINE" ]; then
+        fatal 'MACHINE is not set, please provide a valid machine type (e.g., rancher, observability, rke2)'
+    fi
+
+    cd "${OUTPUT_FOLDER}/vms/${MACHINE}" || fatal "Failed to change directory to ${OUTPUT_FOLDER}/vms/${MACHINE}"
+    ./setup.sh || fatal "Failed to execute setup.sh in ${OUTPUT_FOLDER}/vms/${MACHINE}"
+}
+
 {
   verify_system
   setup_env "$@"
   download
   cleanup
+  provision
+  info 'Provisioning script completed successfully'
 }
