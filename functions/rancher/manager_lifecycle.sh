@@ -63,7 +63,7 @@ rancherprime_install_withcertmanagerclusterissuer() {
     --set agentTLSMode="system-store"
   kubectl wait pods -n cattle-system -l app=rancher --for condition=Ready --timeout=180s
   echo "Waiting for Rancher web app to be running with a valid certificate..."
-  if [ "$hostname" != "rancher.test.host" ]; then
+  if [ "$hostname" == "rancher.test.host" ]; then
     echo "Skipping certificate validation for hostname ${hostname}"
     continue
   else
