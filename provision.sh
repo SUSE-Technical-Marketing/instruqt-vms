@@ -85,12 +85,6 @@ cleanup() {
 
 provision() {
     info 'Provisioning script starting'
-    REG_CODE=${REG_CODE:-''}
-    if [ -z "$REG_CODE" ]; then
-        fatal 'REG_CODE is not set, please provide a valid registration code'
-    fi
-
-    export REG_CODE
 
     MACHINE=${MACHINE:-''}
     if [ -z "$MACHINE" ]; then
