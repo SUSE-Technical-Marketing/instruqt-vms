@@ -28,15 +28,29 @@ RANCHER_ADMIN_PASSWORD="$(tr -dc '[:alnum:]' </dev/urandom | head -c 13; echo '6
 echo -e "\n\n\nthis is it ${RANCHER_ADMIN_PASSWORD}\n\n\n\n"
 ########################  DELETE FOR PROD
 
-# Set variables for the instructions and passing down to other scripts
-agent variable set "PROD_CLUSTER_NAME" "$PROD_CLUSTER_NAME"
-agent variable set "RANCHER_ADMIN" "$RANCHER_ADMIN"
-agent variable set "RANCHER_ADMIN_PASSWORD" "$RANCHER_ADMIN_PASSWORD"
 
-agent variable set "OBSERVABILITY_URL" "$OBSERVABILITY_URL"
-agent variable set "OBSERVABILITY_USER" "$OBSERVABILITY_USERNAME"
+if [ ! -z "${INSTRUQT_AUTH_TOKEN}"]; then
+  # Set variables for the instructions and passing down to other scripts
+  agent variable set "PROD_CLUSTER_NAME" "$PROD_CLUSTER_NAME"
+  agent variable set "RANCHER_ADMIN" "$RANCHER_ADMIN"
+  agent variable set "RANCHER_ADMIN_PASSWORD" "$RANCHER_ADMIN_PASSWORD"
 
+  agent variable set "OBSERVABILITY_URL" "$OBSERVABILITY_URL"
+  agent variable set "OBSERVABILITY_USER" "$OBSERVABILITY_USERNAME"
+else
+  echo "INSTRUQT_AUTH_TOKEN is not set, skipping agent variable setting"
+fi
 
+# Wait for kubernetes to be running
+echo ">>> Waiting for kubernetes to be running"
+for i in {1..60}; do
+  if kubectl cluster-info &>/dev/null; then
+    echo "Kubernetes is running"
+    break
+  fi
+  echo "Waiting for kubernetes to be running..."
+  sleep 5
+done
 
 # Wait for cert-manager
 echo ">>> Waiting for cert-manager to be ready"
