@@ -85,7 +85,7 @@ provision() {
     fi
 
     cd "${OUTPUT_FOLDER}/vms/${MACHINE}" || fatal "Failed to change directory to ${OUTPUT_FOLDER}/vms/${MACHINE}"
-    ./setup.sh || fatal "Failed to execute setup.sh in ${OUTPUT_FOLDER}/vms/${MACHINE}"
+    ./provision.sh || fatal "Failed to execute provision.sh in ${OUTPUT_FOLDER}/vms/${MACHINE}"
 }
 
 register() {
