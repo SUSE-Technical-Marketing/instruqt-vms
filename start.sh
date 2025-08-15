@@ -76,7 +76,9 @@ start() {
     fi
 
     cd "${OUTPUT_FOLDER}/vms/${MACHINE}" || fatal "Failed to change directory to ${OUTPUT_FOLDER}/vms/${MACHINE}"
-    ls -l
+    echo "Current directory: $(pwd)"
+    echo "Listing files in the current directory:"
+    echo "$(ls -l)"
     if [ ! -f start.sh ]; then
         fatal "start.sh not found in ${OUTPUT_FOLDER}/vms/${MACHINE}"
     fi
