@@ -76,7 +76,7 @@ start() {
     fi
 
     cd "${OUTPUT_FOLDER}/vms/${MACHINE}" || fatal "Failed to change directory to ${OUTPUT_FOLDER}/vms/${MACHINE}"
-    . ./start.sh || fatal "Failed to execute start.sh in ${OUTPUT_FOLDER}/vms/${MACHINE}"
+    ./start.sh || fatal "Failed to execute start.sh in ${OUTPUT_FOLDER}/vms/${MACHINE}"
 }
 
 {
