@@ -76,6 +76,10 @@ start() {
     fi
 
     cd "${OUTPUT_FOLDER}/vms/${MACHINE}" || fatal "Failed to change directory to ${OUTPUT_FOLDER}/vms/${MACHINE}"
+    if [ ! -f start.sh ]; then
+        ls -l
+        fatal "start.sh not found in ${OUTPUT_FOLDER}/vms/${MACHINE}"
+    fi
     ./start.sh || fatal "Failed to execute start.sh in ${OUTPUT_FOLDER}/vms/${MACHINE}"
 }
 
