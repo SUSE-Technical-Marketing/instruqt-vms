@@ -30,4 +30,7 @@ k8s_install_certmanager "${CERTMANAGER_VERSION}"
 k8s_create_letsencryptclusterissuer "nginx" "${LETSENCRYPT_EMAIL_ADDRESS}"
 
 echo ">> Install Rancher"
-rancherprime_install_withcertmanagerclusterissuer "${RANCHER_VERSION}" "rancher.test.host"
+rancherprime_install_withcertmanagerclusterissuer "${RANCHER_VERSION}" "rancher.test.host" false
+
+echo ">> Add completions"
+add_completions
