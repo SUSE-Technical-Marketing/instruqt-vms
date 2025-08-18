@@ -130,6 +130,19 @@ spec:
 EOF
 }
 
+rancher_import_cluster() {
+  local name=$1
+
+  echo "Importing cluster ${name} into Rancher..."
+  kubectl apply -f - <<EOF
+apiVersion: provisioning.cattle.io/v1
+kind: Cluster
+metadata:
+  name: ${name}
+  namespace: fleet-default
+EOF
+}
+
 #######################################
 # Create downstream custom cluster in Rancher
 # Globals:
@@ -180,31 +193,23 @@ rancher_get_clusterid() {
   echo "DEBUG CLUSTER_ID=${CLUSTER_ID}"
 }
 
-#######################################
-# Return cluster registration command line from Rancher
-# Arguments:
-#   cluster ID
-# Examples:
-#   CLUSTER_REGISTRATION_COMMAND=$(rancher_get_clusterregistrationcommand 42)
-#######################################
-rancher_return_clusterregistrationcommand() {
-  local id=$1
+rancher_return_clusterregistrationmanifest() {
+  local cluster_id=$1
 
-  kubectl get clusterregistrationtoken.management.cattle.io -n $id -o=jsonpath='{.items[*].status.nodeCommand}'
+  until kubectl get clusterregistrationtokens.management.cattle.io -n ${cluster_id} default-token &>/dev/null; do
+    sleep 5
+  done
+
+  # Get the ClusterRegistrationToken
+  kubectl get clusterregistrationtokens.management.cattle.io -n ${cluster_id} default-token -o jsonpath='{.status.manifestUrl}'
 }
 
-#######################################
-# Get cluster registration command line from Rancher
-# Globals:
-#   REGISTRATION_COMMAND
-# Arguments:
-#   cluster ID
-# Examples:
-#   rancher_get_clusterregistrationcommand 42
-#######################################
-rancher_get_clusterregistrationcommand() {
-  local id=$1
+rancher_download_kubeconfig() {
+  local rancher_url=$1
+  local bearer_token=$2
+  local cluster_name=$3
 
-  REGISTRATION_COMMAND=$(rancher_return_clusterregistrationcommand $id)
-  echo "DEBUG REGISTRATION_COMMAND=${REGISTRATION_COMMAND}"
+  curl -X POST -k -H "Authorization: Bearer $bearer_token" \
+    -H 'Accept: application/json' \
+    ${rancher_url}/v3/clusters/${cluster_name}?action=generateKubeconfig
 }

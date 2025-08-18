@@ -8,38 +8,24 @@ do
   sleep 1
 done
 
-echo "PATH: $PATH"
-echo "User: $(whoami)"
-echo "UID: $(id -u)"
-echo "GID: $(id -g)"
-
-
-# makes sure the registration is ok
-# registercloudguest --force-new
-
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 
 echo "Script directory: ${SCRIPT_DIR}"
-
 . $SCRIPT_DIR/../../functions/index.sh
 
-RANCHER_DOMAIN="rancher.${HOSTNAME}.${_SANDBOX_ID}.instruqt.io"
-RANCHER_URL="https://${RANCHER_DOMAIN}"
+export RANCHER_DOMAIN="rancher.${HOSTNAME}.${_SANDBOX_ID}.instruqt.io"
+export RANCHER_URL="https://${RANCHER_DOMAIN}"
 
-RANCHER_API_URL="${RANCHER_URL}/v3"
-RANCHER_ADMIN="admin"
-RANCHER_ADMIN_PASSWORD="$(tr -dc '[:alnum:]' </dev/urandom | head -c 13; echo '69')"
-
-########################## DELETE FOR PROD
-echo -e "\n\n\nthis is it ${RANCHER_ADMIN_PASSWORD}\n\n\n\n"
-########################  DELETE FOR PROD
-
+export RANCHER_API_URL="${RANCHER_URL}/v3"
+export RANCHER_ADMIN="admin"
+export RANCHER_ADMIN_PASSWORD="$(tr -dc '[:alnum:]' </dev/urandom | head -c 13; echo '69')"
 
 # Set variables for the instructions and passing down to other scripts
 agent variable set "RANCHER_ADMIN" "$RANCHER_ADMIN"
 agent variable set "RANCHER_ADMIN_PASSWORD" "$RANCHER_ADMIN_PASSWORD"
 
 # Wait for kubernetes to be running
+
 echo ">>> Waiting for kubernetes to be running"
 for i in {1..60}; do
   if kubectl cluster-info &>/dev/null; then
@@ -56,8 +42,36 @@ kubectl wait --for=condition=Ready pod -l app.kubernetes.io/instance=cert-manage
 echo ">>> Waiting for ingress-nginx to be ready"
 kubectl wait --for=condition=Ready pod -l app.kubernetes.io/instance=ingress-nginx -n ingress-nginx --timeout=300s
 
-# kubectl patch ingress rancher -n cattle-system --type='json' -p='[{"op": "replace", "path": "/spec/rules/0/host", "value": "'"${RANCHER_DOMAIN}"'"}, {"op": "replace", "path": "/spec/tls/0/hosts/0", "value": "'"${RANCHER_DOMAIN}"'"}]'
-# # Wait for certificate to be issued
-# kubectl wait --for=condition=Ready certificate rancher-tls -n cattle-system --timeout=300s
+echo ">>> Recreating Rancher Ingress"
+kubectl delete validatingwebhookconfiguration ingress-nginx-admission --ignore-not-found
+kubectl delete ingress rancher -n cattle-system --ignore-not-found
+rancher_create_ingress "nginx" "${RANCHER_DOMAIN}"
 
-# rancher_first_login $RANCHER_URL $RANCHER_ADMIN_PASSWORD
+# Wait until certificate to exist (can't use kubectl because the cert is not present yet)
+echo ">>> Waiting for Rancher TLS certificate to be created"
+for i in {1..60}; do
+  if kubectl get certificate rancher-tls -n cattle-system &>/dev/null; then
+    echo "Rancher TLS certificate is ready"
+    break
+  fi
+  echo "Waiting for Rancher TLS certificate to be created..."
+  sleep 5
+done
+
+# # Wait for certificate to be issued
+kubectl wait --for=condition=Ready certificate rancher-tls -n cattle-system --timeout=300s
+
+rancher_first_login $RANCHER_URL $RANCHER_ADMIN_PASSWORD
+BEARER_TOKEN=$(rancher_login_withpassword $RANCHER_URL $RANCHER_ADMIN $RANCHER_ADMIN_PASSWORD)
+
+KUBECONFIG=$(rancher_download_kubeconfig $RANCHER_URL $BEARER_TOKEN "local")
+
+KUBECONFIG=$(echo "$KUBECONFIG" | jq -r ".config")
+echo "$KUBECONFIG" | yq e '.clusters[0].cluster["insecure-skip-tls-verify"] = true | .clusters[0].cluster.certificate-authority-data = ""' > ./${HOSTNAME}-kubeconfig.yaml
+
+# Split DOWNSTREAM_CLUSTERS and iterate over each cluster name
+IFS=',' read -ra CLUSTERS <<< "$DOWNSTREAM_CLUSTERS"
+for CLUSTER in "${CLUSTERS[@]}"; do
+  echo ">>> Copying kubeconfig to downstream cluster: ${CLUSTER}"
+  scp -o StrictHostKeyChecking=accept-new ./${HOSTNAME}-kubeconfig.yaml ${CLUSTER}:${HOSTNAME}-kubeconfig.yaml
+done

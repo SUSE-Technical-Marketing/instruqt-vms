@@ -17,15 +17,14 @@ rancher_login_withpassword() {
   local username=$2
   local password=$3
 
-  echo "Logs in Rancher as ${username} with username and password..."
   LOGIN_RESPONSE=$(curl -s -k "$rancherUrl/v3-public/localProviders/local?action=login" \
     -H 'Content-Type: application/json' \
     --data-binary "{
       \"username\": \"$username\",
       \"password\": \"$password\"
     }")
-  echo "DEBUG LOGIN_RESPONSE=${LOGIN_RESPONSE}"
-  LOGIN_TOKEN=$(echo $LOGIN_RESPONSE | jq -r .token)
+
+  echo $LOGIN_RESPONSE | jq -r .token
 }
 
 #######################################
@@ -71,7 +70,6 @@ rancher_create_apikey() {
   local token=$2
   local description=$3
 
-  echo 'Creates a Rancher API Key...'
   API_KEY_RESPONSE=$(curl -s -k "$rancherUrl/v3/tokens" \
     -H 'Content-Type: application/json' \
     -H "Authorization: Bearer $token" \
@@ -80,7 +78,5 @@ rancher_create_apikey() {
       "description": "'"$description"'",
       "ttl": 0
     }')
-  echo "DEBUG API_KEY_RESPONSE=${API_KEY_RESPONSE}"
-  API_TOKEN=$(echo $API_KEY_RESPONSE | jq -r .token)
-  sleep 5
+  echo $API_KEY_RESPONSE | jq -r .token
 }
