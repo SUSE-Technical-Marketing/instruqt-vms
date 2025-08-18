@@ -35,22 +35,14 @@ echo -e "\n\n\nthis is it ${RANCHER_ADMIN_PASSWORD}\n\n\n\n"
 ########################  DELETE FOR PROD
 
 
-if [ ! -z "${INSTRUQT_AUTH_TOKEN}"]; then
-  # Set variables for the instructions and passing down to other scripts
-  agent variable set "PROD_CLUSTER_NAME" "$PROD_CLUSTER_NAME"
-  agent variable set "RANCHER_ADMIN" "$RANCHER_ADMIN"
-  agent variable set "RANCHER_ADMIN_PASSWORD" "$RANCHER_ADMIN_PASSWORD"
-
-  agent variable set "OBSERVABILITY_URL" "$OBSERVABILITY_URL"
-  agent variable set "OBSERVABILITY_USER" "$OBSERVABILITY_USERNAME"
-else
-  echo "INSTRUQT_AUTH_TOKEN is not set, skipping agent variable setting"
-fi
+# Set variables for the instructions and passing down to other scripts
+agent variable set "RANCHER_ADMIN" "$RANCHER_ADMIN"
+agent variable set "RANCHER_ADMIN_PASSWORD" "$RANCHER_ADMIN_PASSWORD"
 
 # Wait for kubernetes to be running
 echo ">>> Waiting for kubernetes to be running"
 for i in {1..60}; do
-  if /usr/bin/kubectl cluster-info &>/dev/null; then
+  if kubectl cluster-info &>/dev/null; then
     echo "Kubernetes is running"
     break
   fi
@@ -60,10 +52,12 @@ done
 
 # Wait for cert-manager
 echo ">>> Waiting for cert-manager to be ready"
-/usr/bin/kubectl wait --for=condition=Ready pod -l app.kubernetes.io/instance=cert-manager -n cert-manager --timeout=300s
+kubectl wait --for=condition=Ready pod -l app.kubernetes.io/instance=cert-manager -n cert-manager --timeout=300s
+echo ">>> Waiting for ingress-nginx to be ready"
+kubectl wait --for=condition=Ready pod -l app.kubernetes.io/instance=ingress-nginx -n ingress-nginx --timeout=300s
 
-/usr/bin/kubectl patch ingress rancher -n cattle-system --type='json' -p='[{"op": "replace", "path": "/spec/rules/0/host", "value": "'"${RANCHER_DOMAIN}"'"}, {"op": "replace", "path": "/spec/tls/0/hosts/0", "value": "'"${RANCHER_DOMAIN}"'"}]'
-# Wait for certificate to be issued
-/usr/bin/kubectl wait --for=condition=Ready certificate rancher-tls -n cattle-system --timeout=300s
+# kubectl patch ingress rancher -n cattle-system --type='json' -p='[{"op": "replace", "path": "/spec/rules/0/host", "value": "'"${RANCHER_DOMAIN}"'"}, {"op": "replace", "path": "/spec/tls/0/hosts/0", "value": "'"${RANCHER_DOMAIN}"'"}]'
+# # Wait for certificate to be issued
+# kubectl wait --for=condition=Ready certificate rancher-tls -n cattle-system --timeout=300s
 
-rancher_first_login $RANCHER_URL $RANCHER_ADMIN_PASSWORD
+# rancher_first_login $RANCHER_URL $RANCHER_ADMIN_PASSWORD
