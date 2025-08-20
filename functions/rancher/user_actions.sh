@@ -24,7 +24,7 @@ rancher_login_withpassword() {
       \"password\": \"$password\"
     }")
 
-  echo $LOGIN_RESPONSE | jq -r .token
+  echo $LOGIN_RESPONSE | jq -r '.token'
 }
 
 #######################################
@@ -78,5 +78,5 @@ rancher_create_apikey() {
       "description": "'"$description"'",
       "ttl": 0
     }')
-  echo $API_KEY_RESPONSE | jq -r .token
+  echo $API_KEY_RESPONSE | jq -r '.token'
 }

@@ -1,0 +1,13 @@
+---
+# Source: suse-observability-values/templates/baseConfig_values.yaml
+global:
+  imageRegistry: "registry.rancher.com"
+
+stackstate:
+  baseUrl: "obs.host"
+  authentication:
+    adminPassword: "$2a$10$8ckN5zeDpv.WOmscxq8oQuBi4WhttbQDjnLbA8T41yXQQ.A4o6z0u"
+  apiKey:
+    key: "AzoIOZdZN97oBW8Mi1fW95k99hph2RyD"
+  license:
+    key: "test-lic"

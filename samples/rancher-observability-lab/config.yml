@@ -1,0 +1,35 @@
+version: "3"
+virtualbrowsers:
+- name: rancher
+  url: https://rancher.manager.${_SANDBOX_ID}.instruqt.io
+virtualmachines:
+- name: manager
+  image: suse/rancher-2-11
+  machine_type: n1-standard-2
+  allow_external_ingress:
+  - high-ports
+  - http
+  - https
+  environment:
+    DOWNSTREAM_CLUSTERS: production
+- name: ops
+  image: suse/observability-2-3-7
+  machine_type: n2d-standard-8
+  allow_external_ingress:
+  - high-ports
+  - http
+  - https
+  environment:
+    OBSERVABILITY_SERVICE_TOKEN: svctoken-${_SANDBOX_ID}
+    OBSERVABILITY_HOST: observability.ops.${_SANDBOX_ID}.instruqt.io
+- name: production
+  image: suse/k3s-1-32
+  machine_type: n1-standard-4
+  allow_external_ingress:
+  - high-ports
+  - http
+  - https
+  environment:
+    MANAGER_HOSTNAME: manager
+secrets:
+  - name: OBSERVABILITY_LICENSE

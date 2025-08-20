@@ -31,3 +31,12 @@ echo ">> Install cert-manager"
 k8s_install_certmanager "${CERTMANAGER_VERSION}"
 k8s_create_letsencryptclusterissuer "nginx" "${LETSENCRYPT_EMAIL_ADDRESS}"
 
+observability_add_helm_repo
+
+echo ">> Generate values for observability"
+# Provision with dummy values, this ensures that the observability server is installed and most pods will not change afterwards
+observability_generate_values "no-license" "test.host" "dummy-password" "svctok-instruqt"
+observability_install_server $OBSERVABILITY_VERSION
+
+echo ">>> Waiting for Observability Pods to be available..."
+observability_wait_for_pods

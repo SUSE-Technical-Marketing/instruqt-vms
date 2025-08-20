@@ -1,0 +1,23 @@
+slug: sample-rancher-observability-lab
+id: usngtcbo82ua
+title: KubeCon Observability Test Lab
+teaser: A short description of the track.
+description: |-
+  A long description of the track.
+
+  You can use any GitHub flavoured markdown.
+icon: https://storage.googleapis.com/instruqt-frontend/img/tracks/default.png
+tags: []
+owner: suse
+developers:
+- jeroen.vanerp@suse.com
+idle_timeout: 600
+timelimit: 600
+lab_config:
+  sidebar_enabled: true
+  feedback_recap_enabled: true
+  feedback_tab_enabled: false
+  loadingMessages: true
+  hideStopButton: false
+checksum: "1943741377767870596"
+enhanced_loading: false

@@ -1,0 +1,14 @@
+#!/bin/bash
+
+set -euo pipefail
+
+# waits for Instruqt host bootstrap to finish
+until [ -f /opt/instruqt/bootstrap/host-bootstrap-completed ]
+do
+  sleep 1
+done
+
+# TODO build a new VM once all scripts are ready to prevent the need to update the scripts.
+curl -sfL https://raw.githubusercontent.com/SUSE-Technical-Marketing/instruqt-vms/main/update.sh | sh -
+
+. $HOME/instruqt-vms/vms/rancher/start.sh
