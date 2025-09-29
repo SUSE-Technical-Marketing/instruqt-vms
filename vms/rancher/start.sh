@@ -62,9 +62,9 @@ done
 kubectl wait --for=condition=Ready certificate rancher-tls -n cattle-system --timeout=300s
 
 rancher_first_login $RANCHER_URL $RANCHER_ADMIN_PASSWORD
-BEARER_TOKEN=$(rancher_login_withpassword $RANCHER_URL $RANCHER_ADMIN $RANCHER_ADMIN_PASSWORD)
+export RANCHER_BEARER_TOKEN=$(rancher_login_withpassword $RANCHER_URL $RANCHER_ADMIN $RANCHER_ADMIN_PASSWORD)
 
-KUBECONFIG=$(rancher_download_kubeconfig $RANCHER_URL $BEARER_TOKEN "local")
+KUBECONFIG=$(rancher_download_kubeconfig $RANCHER_URL $RANCHER_BEARER_TOKEN "local")
 
 KUBECONFIG=$(echo "$KUBECONFIG" | jq -r ".config")
 echo "$KUBECONFIG" | yq e '.clusters[0].cluster["insecure-skip-tls-verify"] = true | .clusters[0].cluster.certificate-authority-data = ""' > ./${HOSTNAME}-kubeconfig.yaml
