@@ -35,7 +35,7 @@ observability_add_helm_repo
 
 echo ">> Generate values for observability"
 # Provision with dummy values, this ensures that the observability server is installed and most pods will not change afterwards
-observability_generate_values "no-license" "https://test.host" "dummy-password" "svctok-instruqt"
+observability_generate_values "no-license" "test.host" "dummy-password" "svctok-instruqt"
 observability_install_server $OBSERVABILITY_VERSION
 
 echo ">>> Waiting for Observability Pods to be available..."

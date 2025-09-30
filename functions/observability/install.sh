@@ -12,7 +12,7 @@ observability_generate_values() {
     local values_dir=.
 
     helm template --set license=$license \
-        --set baseUrl=$host \
+        --set baseUrl="https://$host" \
         --set adminPassword=$admin_password \
         --set sizing.profile=trial \
         suse-observability-values suse-observability/suse-observability-values \
