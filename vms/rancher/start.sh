@@ -45,33 +45,33 @@ kubectl wait --for=condition=Ready pod -l app.kubernetes.io/instance=ingress-ngi
 echo ">>> Recreating Rancher Ingress"
 kubectl delete validatingwebhookconfiguration ingress-nginx-admission --ignore-not-found
 kubectl delete ingress rancher -n cattle-system --ignore-not-found
-# # rancher_create_ingress "nginx" "${RANCHER_DOMAIN}"
+rancher_create_ingress "nginx" "${RANCHER_DOMAIN}"
 
-# # # Wait until certificate to exist (can't use kubectl because the cert is not present yet)
-# # echo ">>> Waiting for Rancher TLS certificate to be created"
-# # for i in {1..60}; do
-# #   if kubectl get certificate rancher-tls -n cattle-system &>/dev/null; then
-# #     echo "Rancher TLS certificate is ready"
-# #     break
-# #   fi
-# #   echo "Waiting for Rancher TLS certificate to be created..."
-# #   sleep 5
-# # done
+# Wait until certificate to exist (can't use kubectl because the cert is not present yet)
+echo ">>> Waiting for Rancher TLS certificate to be created"
+for i in {1..60}; do
+  if kubectl get certificate rancher-tls -n cattle-system &>/dev/null; then
+    echo "Rancher TLS certificate is ready"
+    break
+  fi
+  echo "Waiting for Rancher TLS certificate to be created..."
+  sleep 5
+done
 
-# # # # Wait for certificate to be issued
-# # kubectl wait --for=condition=Ready certificate rancher-tls -n cattle-system --timeout=300s
+# # Wait for certificate to be issued
+kubectl wait --for=condition=Ready certificate rancher-tls -n cattle-system --timeout=300s
 
-# rancher_first_login $RANCHER_URL $RANCHER_ADMIN_PASSWORD
-# export RANCHER_BEARER_TOKEN=$(rancher_login_withpassword $RANCHER_URL $RANCHER_ADMIN $RANCHER_ADMIN_PASSWORD)
+rancher_first_login $RANCHER_URL $RANCHER_ADMIN_PASSWORD
+export RANCHER_BEARER_TOKEN=$(rancher_login_withpassword $RANCHER_URL $RANCHER_ADMIN $RANCHER_ADMIN_PASSWORD)
 
-# KUBECONFIG=$(rancher_download_kubeconfig $RANCHER_URL $RANCHER_BEARER_TOKEN "local")
+KUBECONFIG=$(rancher_download_kubeconfig $RANCHER_URL $RANCHER_BEARER_TOKEN "local")
 
-# KUBECONFIG=$(echo "$KUBECONFIG" | jq -r ".config")
-# echo "$KUBECONFIG" | yq e '.clusters[0].cluster["insecure-skip-tls-verify"] = true | .clusters[0].cluster.certificate-authority-data = ""' > ./${HOSTNAME}-kubeconfig.yaml
+KUBECONFIG=$(echo "$KUBECONFIG" | jq -r ".config")
+echo "$KUBECONFIG" | yq e '.clusters[0].cluster["insecure-skip-tls-verify"] = true | .clusters[0].cluster.certificate-authority-data = ""' > ./${HOSTNAME}-kubeconfig.yaml
 
-# # Split DOWNSTREAM_CLUSTERS and iterate over each cluster name
-# IFS=',' read -ra CLUSTERS <<< "$DOWNSTREAM_CLUSTERS"
-# for CLUSTER in "${CLUSTERS[@]}"; do
-#   echo ">>> Copying kubeconfig to downstream cluster: ${CLUSTER}"
-#   scp -o StrictHostKeyChecking=accept-new ./${HOSTNAME}-kubeconfig.yaml ${CLUSTER}:${HOSTNAME}-kubeconfig.yaml
-# done
+# Split DOWNSTREAM_CLUSTERS and iterate over each cluster name
+IFS=',' read -ra CLUSTERS <<< "$DOWNSTREAM_CLUSTERS"
+for CLUSTER in "${CLUSTERS[@]}"; do
+  echo ">>> Copying kubeconfig to downstream cluster: ${CLUSTER}"
+  scp -o StrictHostKeyChecking=accept-new ./${HOSTNAME}-kubeconfig.yaml ${CLUSTER}:${HOSTNAME}-kubeconfig.yaml
+done
