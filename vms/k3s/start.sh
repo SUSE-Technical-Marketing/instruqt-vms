@@ -12,6 +12,7 @@ echo "Script directory: ${SCRIPT_DIR}"
 . $SCRIPT_DIR/../../functions/index.sh
 
 export KUBECONFIG=~/${MANAGER_HOSTNAME}-kubeconfig.yaml
+cat ~/${MANAGER_HOSTNAME}-kubeconfig.yaml
 
 rancher_import_cluster ${HOSTNAME}
 CLUSTER_ID="$(rancher_return_clusterid ${HOSTNAME})"

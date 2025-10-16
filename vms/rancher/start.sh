@@ -67,7 +67,7 @@ export RANCHER_BEARER_TOKEN=$(rancher_login_withpassword $RANCHER_URL $RANCHER_A
 KUBECONFIG=$(rancher_download_kubeconfig $RANCHER_URL $RANCHER_BEARER_TOKEN "local")
 
 KUBECONFIG=$(echo "$KUBECONFIG" | jq -r ".config")
-echo "$KUBECONFIG" | yq e '.clusters[0].cluster["insecure-skip-tls-verify"] = true | .clusters[0].cluster.certificate-authority-data = ""' > ./${HOSTNAME}-kubeconfig.yaml
+echo "$KUBECONFIG" | yq e '.clusters[0].cluster["insecure-skip-tls-verify"] = true | .clusters[0].cluster.certificate-authority-data = "" | .clusters[0].cluster.server = "https://rancher.${HOSTNAME}.${_SANDBOX_ID}.instruqt.io/k8s/clusters/local"' > ./${HOSTNAME}-kubeconfig.yaml
 
 # Split DOWNSTREAM_CLUSTERS and iterate over each cluster name
 IFS=',' read -ra CLUSTERS <<< "$DOWNSTREAM_CLUSTERS"
