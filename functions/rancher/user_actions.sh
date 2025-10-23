@@ -16,15 +16,39 @@ rancher_login_withpassword() {
   local rancherUrl=$1
   local username=$2
   local password=$3
+  local max_retries=5
+  local retry_count=0
+  local http_code
+  local response_body
 
-  LOGIN_RESPONSE=$(curl -s -k "$rancherUrl/v3-public/localProviders/local?action=login" \
-    -H 'Content-Type: application/json' \
-    --data-binary "{
-      \"username\": \"$username\",
-      \"password\": \"$password\"
-    }")
-
-  echo $LOGIN_RESPONSE | jq -r '.token'
+  while [ $retry_count -lt $max_retries ]; do
+    # Use -w to capture HTTP status code separately from response body
+    response=$(curl -s -k -w "\n%{http_code}" "$rancherUrl/v3-public/localProviders/local?action=login" \
+      -H 'Content-Type: application/json' \
+      --data-binary "{
+        \"username\": \"$username\",
+        \"password\": \"$password\"
+      }")
+    
+    # Split response: last line is http_code, rest is body
+    response_body=$(echo "$response" | sed '$d')
+    http_code=$(echo "$response" | tail -n1)
+    
+    # Check if HTTP status code is in 2xx range
+    if [ "$http_code" -ge 200 ] && [ "$http_code" -lt 300 ]; then
+      echo "$response_body" | jq -r '.token'
+      return 0
+    fi
+    
+    retry_count=$((retry_count + 1))
+    if [ $retry_count -lt $max_retries ]; then
+      echo "Login attempt $retry_count failed with HTTP $http_code, retrying..." >&2
+      sleep 2
+    fi
+  done
+  
+  echo "Failed to login after $max_retries attempts (last HTTP code: $http_code)" >&2
+  return 1
 }
 
 #######################################
