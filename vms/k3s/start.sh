@@ -14,8 +14,10 @@ echo "Script directory: ${SCRIPT_DIR}"
 export KUBECONFIG=~/${MANAGER_HOSTNAME}-kubeconfig.yaml
 cat ~/${MANAGER_HOSTNAME}-kubeconfig.yaml
 
-# rancher_import_cluster ${HOSTNAME}
-# CLUSTER_ID="$(rancher_return_clusterid ${HOSTNAME})"
+rancher_import_cluster ${HOSTNAME}
+CLUSTER_ID="$(rancher_return_clusterid ${HOSTNAME})"
+
+echo "Cluster ID: ${CLUSTER_ID}"
 
 # # Get the ClusterRegistrationToken
 # CLUSTER_TOKEN=$(rancher_return_clusterregistrationmanifest "${CLUSTER_ID}")
