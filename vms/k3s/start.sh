@@ -14,17 +14,17 @@ echo "Script directory: ${SCRIPT_DIR}"
 export KUBECONFIG=~/${MANAGER_HOSTNAME}-kubeconfig.yaml
 cat ~/${MANAGER_HOSTNAME}-kubeconfig.yaml
 
-rancher_import_cluster ${HOSTNAME}
-CLUSTER_ID="$(rancher_return_clusterid ${HOSTNAME})"
+# rancher_import_cluster ${HOSTNAME}
+# CLUSTER_ID="$(rancher_return_clusterid ${HOSTNAME})"
 
-# Get the ClusterRegistrationToken
-CLUSTER_TOKEN=$(rancher_return_clusterregistrationmanifest "${CLUSTER_ID}")
+# # Get the ClusterRegistrationToken
+# CLUSTER_TOKEN=$(rancher_return_clusterregistrationmanifest "${CLUSTER_ID}")
 
-# Switch to downstream cluster
-unset KUBECONFIG
+# # Switch to downstream cluster
+# unset KUBECONFIG
 
-kubectl apply -f "${CLUSTER_TOKEN}"
+# kubectl apply -f "${CLUSTER_TOKEN}"
 
-echo "Waiting for the cluster to be registered..."
-export KUBECONFIG=~/${MANAGER_HOSTNAME}-kubeconfig.yaml
-kubectl wait --for=condition=Ready --timeout=300s cluster.provisioning.cattle.io -n fleet-default ${HOSTNAME}
+# echo "Waiting for the cluster to be registered..."
+# export KUBECONFIG=~/${MANAGER_HOSTNAME}-kubeconfig.yaml
+# kubectl wait --for=condition=Ready --timeout=300s cluster.provisioning.cattle.io -n fleet-default ${HOSTNAME}
