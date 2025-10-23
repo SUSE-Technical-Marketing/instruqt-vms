@@ -4,7 +4,7 @@ virtualbrowsers:
   url: https://rancher.manager.${_SANDBOX_ID}.instruqt.io
 virtualmachines:
 - name: manager
-  image: suse/rancher-2-11
+  image: suse/rancher-2-12-2
   machine_type: n1-standard-2
   allow_external_ingress:
   - high-ports
@@ -13,7 +13,7 @@ virtualmachines:
   environment:
     DOWNSTREAM_CLUSTERS: production
 - name: ops
-  image: suse/observability-2-3-7
+  image: suse/observability-2-6-0
   machine_type: n2d-standard-8
   allow_external_ingress:
   - high-ports
