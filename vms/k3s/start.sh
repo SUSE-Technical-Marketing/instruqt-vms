@@ -19,14 +19,15 @@ CLUSTER_ID="$(rancher_return_clusterid ${HOSTNAME})"
 
 echo "Cluster ID: ${CLUSTER_ID}"
 
-# # Get the ClusterRegistrationToken
-# CLUSTER_TOKEN=$(rancher_return_clusterregistrationmanifest "${CLUSTER_ID}")
+# Get the ClusterRegistrationToken
+CLUSTER_TOKEN=$(rancher_return_clusterregistrationmanifest "${CLUSTER_ID}")
 
-# # Switch to downstream cluster
-# unset KUBECONFIG
+echo "Cluster registration token manifest: ${CLUSTER_TOKEN}"
+# Switch to downstream cluster
+unset KUBECONFIG
 
-# kubectl apply -f "${CLUSTER_TOKEN}"
+kubectl apply -f "${CLUSTER_TOKEN}"
 
-# echo "Waiting for the cluster to be registered..."
-# export KUBECONFIG=~/${MANAGER_HOSTNAME}-kubeconfig.yaml
-# kubectl wait --for=condition=Ready --timeout=300s cluster.provisioning.cattle.io -n fleet-default ${HOSTNAME}
+echo "Waiting for the cluster to be registered..."
+export KUBECONFIG=~/${MANAGER_HOSTNAME}-kubeconfig.yaml
+kubectl wait --for=condition=Ready --timeout=300s cluster.provisioning.cattle.io -n fleet-default ${HOSTNAME}
