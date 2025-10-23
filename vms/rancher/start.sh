@@ -61,8 +61,12 @@ done
 # # Wait for certificate to be issued
 kubectl wait --for=condition=Ready certificate rancher-tls -n cattle-system --timeout=300s
 
-rancher_first_login $RANCHER_URL $RANCHER_ADMIN_PASSWORD
-export RANCHER_BEARER_TOKEN=$(rancher_login_withpassword $RANCHER_URL $RANCHER_ADMIN $RANCHER_ADMIN_PASSWORD)
+# Wait for Rancher deployment to be ready
+echo ">>> Waiting for Rancher deployment to be ready"
+kubectl wait --for=condition=Available deployment/rancher -n cattle-system --timeout=300s
+
+rancher_first_login $RANCHER_URL "$RANCHER_ADMIN_PASSWORD"
+export RANCHER_BEARER_TOKEN=$(rancher_login_withpassword $RANCHER_URL $RANCHER_ADMIN "$RANCHER_ADMIN_PASSWORD")
 
 KUBECONFIG=$(rancher_download_kubeconfig $RANCHER_URL $RANCHER_BEARER_TOKEN "local")
 
