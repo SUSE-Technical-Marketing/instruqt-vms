@@ -66,16 +66,51 @@ rancher_update_password() {
   local token=$2
   local currentPassword=$3
   local newPassword=$4
+  local max_retries=5
+  local retry_count=0
+  local http_code
+  local response_body
 
   echo 'Updates Rancher user password...'
-  curl -s -k -H "Authorization: Bearer $token" \
-    -H 'Content-Type: application/json' \
-    -X POST \
-    -d '{
-      "currentPassword": "'"$currentPassword"'",
-      "newPassword": "'"$newPassword"'"
-    }' \
-    "$rancherUrl/v3/users?action=changepassword"
+  
+  while [ $retry_count -lt $max_retries ]; do
+    # Use -w to capture HTTP status code separately from response body
+    response=$(curl -s -k -w "\n%{http_code}" \
+      -H "Authorization: Bearer $token" \
+      -H 'Content-Type: application/json' \
+      -X POST \
+      -d '{
+        "currentPassword": "'"$currentPassword"'",
+        "newPassword": "'"$newPassword"'"
+      }' \
+      "$rancherUrl/v3/users?action=changepassword")
+    
+    # Split response: last line is http_code, rest is body
+    response_body=$(echo "$response" | sed '$d')
+    http_code=$(echo "$response" | tail -n1)
+    
+    # Check if HTTP status code is in 2xx range
+    if [ "$http_code" -ge 200 ] && [ "$http_code" -lt 300 ]; then
+      echo "$response_body"
+      return 0
+    fi
+    
+    retry_count=$((retry_count + 1))
+    if [ $retry_count -lt $max_retries ]; then
+      echo "Password update attempt $retry_count failed with HTTP $http_code, retrying..." >&2
+      # Show error message if it's a conflict/server error
+      if echo "$response_body" | jq -e '.code' >/dev/null 2>&1; then
+        echo "Error: $(echo "$response_body" | jq -r '.message // .code')" >&2
+      fi
+      sleep 2
+    fi
+  done
+  
+  echo "Failed to update password after $max_retries attempts (last HTTP code: $http_code)" >&2
+  if echo "$response_body" | jq -e '.code' >/dev/null 2>&1; then
+    echo "Last error: $(echo "$response_body" | jq -r '.message // .code')" >&2
+  fi
+  return 1
 }
 
 #######################################
