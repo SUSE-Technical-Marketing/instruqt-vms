@@ -95,16 +95,16 @@ security_install() {
     -f neuvector-values.yaml
 }
 
-neuvector_accept_eula() {
-  local username=${1:-admin}
-  local password=${2:-admin}
+# neuvector_accept_eula() {
+#   local username=${1:-admin}
+#   local password=${2:-admin}
 
-  neuvector_ip=$(kubectl get svc neuvector-svc-controller-api -n cattle-neuvector-system -o jsonpath='{.spec.clusterIP}')
+#   neuvector_ip=$(kubectl get svc neuvector-svc-controller-api -n cattle-neuvector-system -o jsonpath='{.spec.clusterIP}')
 
-  curl $curl_extras -k -H "Content-Type: application/json" -d '{"password": {"username": "'$username'", "password": "'$password"}}' "https://${_nv_ip}:10443/v1/auth" > /dev/null 2>&1 > token.json
-_TOKEN_=`cat token.json | jq -r '.token.token'`
+#   curl $curl_extras -k -H "Content-Type: application/json" -d '{"password": {"username": "'$username'", "password": "'$password"}}' "https://${_nv_ip}:10443/v1/auth" > /dev/null 2>&1 > token.json
+# _TOKEN_=`cat token.json | jq -r '.token.token'`
 
 
-curl $curl_extras -s -k -H 'Content-Type: application/json' -H "X-Auth-Token: ${_TOKEN_}" -d '{"eula":{"accepted":true}}' https://${_nv_ip}:10443/v1/eula
+# curl $curl_extras -s -k -H 'Content-Type: application/json' -H "X-Auth-Token: ${_TOKEN_}" -d '{"eula":{"accepted":true}}' https://${_nv_ip}:10443/v1/eula
 
-}
+# }
