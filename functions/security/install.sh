@@ -81,10 +81,8 @@ rbac: true
 EOF
 }
 
-install_suse_security() {
+security_install() {
   local version=$1
-  local hostname=$2
-  local rancher_url=$3
   helm repo add rancher-charts https://charts.rancher.io
   helm repo update
   helm install neuvector-crd --namespace cattle-neuvector-system --create-namespace rancher-charts/neuvector-crd --version=${version}
