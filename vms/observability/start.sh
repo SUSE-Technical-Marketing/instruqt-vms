@@ -16,6 +16,13 @@ echo "Script directory: ${SCRIPT_DIR}"
 . $SCRIPT_DIR/../../functions/index.sh
 
 
+# Wait for cert-manager
+echo ">>> Waiting for cert-manager to be ready"
+kubectl wait --for=condition=Ready pod -l app.kubernetes.io/instance=cert-manager -n cert-manager --timeout=300s
+echo ">>> Waiting for ingress-nginx to be ready"
+kubectl wait --for=condition=Ready pod -l app.kubernetes.io/instance=ingress-nginx -n ingress-nginx --timeout=300s
+
+
 export OBSERVABILITY_ADMIN_PASSWORD="$(tr -dc '[:alnum:]' </dev/urandom | head -c 13; echo '69')"
 agent variable set OBSERVABILITY_ADMIN_PASSWORD "${OBSERVABILITY_ADMIN_PASSWORD}"
 
