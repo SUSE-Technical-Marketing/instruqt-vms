@@ -20,22 +20,22 @@ export OBSERVABILITY_ADMIN_PASSWORD="$(tr -dc '[:alnum:]' </dev/urandom | head -
 agent variable set OBSERVABILITY_ADMIN_PASSWORD "${OBSERVABILITY_ADMIN_PASSWORD}"
 
 if [ -z "${OBSERVABILITY_LICENSE}" ]; then
-  fatal "OBSERVABILITY_LICENSE is not set. Please provide a valid license."
+  fail-message "OBSERVABILITY_LICENSE is not set. Please provide a valid license."
 fi
 
 # Ensure the observability service token is set
 if [ -z "${OBSERVABILITY_SERVICE_TOKEN}" ]; then
-  fatal "OBSERVABILITY_SERVICE_TOKEN is not set. Please provide a valid service token."
+  fail-message "OBSERVABILITY_SERVICE_TOKEN is not set. Please provide a valid service token."
 fi
 
 # Ensure the observability host is set
 if [ -z "${OBSERVABILITY_HOST}" ]; then
-  fatal "OBSERVABILITY_HOST is not set. Please provide a valid host."
+  fail-message "OBSERVABILITY_HOST is not set. Please provide a valid host."
 fi
 
 observability_generate_values "${OBSERVABILITY_LICENSE}" "${OBSERVABILITY_HOST}" "${OBSERVABILITY_ADMIN_PASSWORD}" "${OBSERVABILITY_SERVICE_TOKEN}"
 observability_install_server $OBSERVABILITY_VERSION true
 if [ $? -ne 0 ]; then
   kubectl get pods -n suse-observability
-  fatal "Failed to wait for observability pods to be ready."
+  fail-message "Failed to wait for observability pods to be ready."
 fi
