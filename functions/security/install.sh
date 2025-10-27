@@ -19,6 +19,7 @@ manager:
       ssl: true
     annotations:
       cert-manager.io/cluster-issuer: letsencrypt-prod
+      kubernetes.io/ingress.class: nginx
     host: ${hostname}
     secretName: neuvector-tls
   svc:
@@ -34,7 +35,7 @@ controller:
     mastersvc:
       type: ClusterIP
   pvc:
-    enabled: true
+    enabled: false
   ranchersso:
     enabled: true
   configmap:
