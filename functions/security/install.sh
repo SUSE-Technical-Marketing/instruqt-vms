@@ -88,7 +88,7 @@ security_install() {
   helm install neuvector-crd --namespace cattle-neuvector-system --create-namespace rancher-charts/neuvector-crd --version=${version}
   helm upgrade -i \
     neuvector \
-    rancher-charts/neuvector $version \
+    rancher-charts/neuvector --version=$version \
     --namespace cattle-neuvector-system \
     --labels=catalog.cattle.io/cluster-repo-name=rancher-charts \
     --create-namespace \
