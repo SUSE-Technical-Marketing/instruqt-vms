@@ -16,6 +16,17 @@ echo "Script directory: ${SCRIPT_DIR}"
 . $SCRIPT_DIR/../../functions/index.sh
 
 
+echo ">>> Waiting for kubernetes to be running"
+for i in {1..60}; do
+  if kubectl cluster-info &>/dev/null; then
+    echo "Kubernetes is running"
+    break
+  fi
+  echo "Waiting for kubernetes to be running..."
+  sleep 5
+done
+
+
 # Wait for cert-manager
 echo ">>> Waiting for cert-manager to be ready"
 kubectl wait --for=condition=Ready pod -l app.kubernetes.io/instance=cert-manager -n cert-manager --timeout=300s
