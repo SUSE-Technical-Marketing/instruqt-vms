@@ -31,3 +31,6 @@ kubectl apply -f "${CLUSTER_TOKEN}"
 echo "Waiting for the cluster to be registered..."
 export KUBECONFIG=~/${MANAGER_HOSTNAME}-kubeconfig.yaml
 kubectl wait --for=condition=Ready --timeout=300s cluster.provisioning.cattle.io -n fleet-default ${HOSTNAME}
+
+# Switch to downstream cluster
+unset KUBECONFIG
