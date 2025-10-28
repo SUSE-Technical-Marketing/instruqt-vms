@@ -64,7 +64,9 @@ controller:
       sysinitcfg.yaml: |
         New_Service_Profile_Baseline: basic
         Auth_By_Platform: true
-        Cluster_Name: myclu
+        Cluster_Name: ${hostname}
+        Scan_Config:
+          Auto_Scan: true
       userinitcfg.yaml: |
         users:
         - Fullname: ${username}
