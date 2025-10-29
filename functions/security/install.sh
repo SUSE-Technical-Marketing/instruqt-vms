@@ -86,6 +86,13 @@ EOF
 
 security_install() {
   local version=$1
+  local wait_ready=${2:-true}
+
+  wait_opts=""
+  if [ "$wait_ready" = true ] ; then
+    wait_opts="--wait"
+  fi
+
   helm repo add rancher-charts https://charts.rancher.io
   helm repo update
   helm install neuvector-crd --namespace cattle-neuvector-system --create-namespace rancher-charts/neuvector-crd --version=${version}
@@ -95,6 +102,7 @@ security_install() {
     --namespace cattle-neuvector-system \
     --labels=catalog.cattle.io/cluster-repo-name=rancher-charts \
     --create-namespace \
+    $wait_opts \
     -f neuvector-values.yaml
 }
 
