@@ -134,13 +134,32 @@ rancher_import_cluster() {
   local name=$1
 
   echo "Importing cluster ${name} into Rancher..."
-  kubectl apply -f - <<EOF
+  local max_retries=5
+  local retry_count=0
+  local retry_delay=10
+
+  while [ $retry_count -lt $max_retries ]; do
+    if kubectl apply -f - <<EOF
 apiVersion: provisioning.cattle.io/v1
 kind: Cluster
 metadata:
   name: ${name}
   namespace: fleet-default
 EOF
+    then
+      echo "Successfully imported cluster ${name}"
+      return 0
+    else
+      retry_count=$((retry_count + 1))
+      if [ $retry_count -lt $max_retries ]; then
+        echo "Failed to import cluster (attempt $retry_count/$max_retries). Retrying in ${retry_delay}s..."
+        sleep $retry_delay
+      else
+        echo "ERROR: Failed to import cluster after $max_retries attempts"
+        return 1
+      fi
+    fi
+  done
 }
 
 #######################################
