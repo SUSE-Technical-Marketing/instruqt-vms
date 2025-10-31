@@ -34,3 +34,21 @@ spec:
   url: oci://dp.apps.rancher.io/charts
 EOF
 }
+
+appco_copy_token_downstream() {
+  local downstream_clusters=$1
+  local appco_user=$2
+  local appco_token=$3
+
+  IFS=',' read -ra CLUSTERS <<< "$downstream_clusters"
+  for CLUSTER in "${CLUSTERS[@]}"; do
+    echo ">>> Creating AppCo Secret on $CLUSTER"
+    cat << EOF > /tmp/appco-secret.json
+  {
+    "username": "$appco_user",
+    "token": "$appco_token"
+  }
+  EOF
+    scp -o StrictHostKeyChecking=accept-new /tmp/appco-secret.json $CLUSTER:/tmp/appco-secret.json
+  done
+}
