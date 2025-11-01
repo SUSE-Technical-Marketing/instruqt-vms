@@ -44,11 +44,11 @@ appco_copy_token_downstream() {
   for CLUSTER in "${CLUSTERS[@]}"; do
     echo ">>> Creating AppCo Secret on $CLUSTER"
     cat << EOF > /tmp/appco-secret.json
-  {
-    "username": "$appco_user",
-    "token": "$appco_token"
-  }
-  EOF
+{
+  "username": "$appco_user",
+  "token": "$appco_token"
+}
+EOF
     scp -o StrictHostKeyChecking=accept-new /tmp/appco-secret.json $CLUSTER:/tmp/appco-secret.json
   done
 }
