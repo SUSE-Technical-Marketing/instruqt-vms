@@ -1,16 +1,17 @@
 security_values() {
   local hostname=$1
   local rancher_url=$2
-  local username=${3:-admin}
-  local password=${4:-admin}
+  local cluster_name=${3}
+  local username=${4:-admin}
+  local password=${5:-admin}
 
   cat << EOF > neuvector-values.yaml
 global:
   cattle:
     url: ${rancher_url}
-    systemDefaultRegistry: registry.rancher.com
-  systemDefaultRegistry: registry.rancher.com
 registry: registry.rancher.com
+labels:
+  catalog.cattle.io/cluster-repo-name: rancher-charts
 manager:
   ingress:
     enabled: true
@@ -31,13 +32,13 @@ controller:
   replicas: 1
   prime:
     enabled: true
+  ranchersso:
+    enabled: true
   federation:
     mastersvc:
       type: ClusterIP
   pvc:
     enabled: false
-  ranchersso:
-    enabled: true
   configmap:
     enabled: true
     data:
@@ -61,16 +62,25 @@ controller:
           password_keep_history_count: 0
           # Optional. value between 30 -- 3600  default 300
           session_timeout: 3600
+      # ...
+      # roleinitcfg.yaml: |
+      #  ...
+      # ldapinitcfg.yaml: |
+      #  ...
+      # oidcinitcfg.yaml: |
+      # ...
+      # samlinitcfg.yaml: |
+      # ...
       sysinitcfg.yaml: |
         New_Service_Profile_Baseline: basic
         Auth_By_Platform: true
-        Cluster_Name: ${hostname}
+        Cluster_Name: ${cluster_name}
         Scan_Config:
           Auto_Scan: true
       userinitcfg.yaml: |
         users:
-        - Fullname: ${username}
-          Password: ${password}
+        - Fullname: admin
+          Password: admin
           Role: admin
           Timeout: 3600
 cve:
