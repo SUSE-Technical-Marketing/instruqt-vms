@@ -79,8 +79,8 @@ controller:
           Auto_Scan: true
       userinitcfg.yaml: |
         users:
-        - Fullname: admin
-          Password: admin
+        - Fullname: ${username}
+          Password: ${password}
           Role: admin
           Timeout: 3600
 cve:
