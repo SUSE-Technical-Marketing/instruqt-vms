@@ -59,15 +59,13 @@ download() {
     fi
     tar -xzf ${GIT_REPO_NAME}.tar.gz
     mkdir -p ${OUTPUT_FOLDER}
-    if [ -d ${OUTPUT_FOLDER}/scripts ]; then
-        warn "Output folder ${OUTPUT_FOLDER}/functions already exists, removing it"
-        rm -rf ${OUTPUT_FOLDER}/functions
-        rm -rf ${OUTPUT_FOLDER}/vms
-        rm -rf ${OUTPUT_FOLDER}/env
-    fi
-    mv ${GIT_REPO_NAME}-${GIT_FOLDER}/functions ${OUTPUT_FOLDER}
-    mv ${GIT_REPO_NAME}-${GIT_FOLDER}/vms ${OUTPUT_FOLDER}
-    mv ${GIT_REPO_NAME}-${GIT_FOLDER}/env ${OUTPUT_FOLDER}
+    for dir in functions vms env assets; do
+      if [ -d ${OUTPUT_FOLDER}/$dir ]; then
+          warn "Output folder ${OUTPUT_FOLDER}/$dir already exists, removing it"
+          rm -rf ${OUTPUT_FOLDER}/$dir
+      fi
+      mv ${GIT_REPO_NAME}-${GIT_FOLDER}/$dir ${OUTPUT_FOLDER}
+    done
 }
 
 cleanup() {
