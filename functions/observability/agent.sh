@@ -64,8 +64,8 @@ observability_create_agent_service_token() {
   local service_token=$3
 
   local resp
-  /usr/local/bin/sts rbac create-subject --subject $cluster_name-agent --service-token $service_token --url $url
-  /usr/local/bin/sts rbac grant --subject $cluster_name-agent --permission update-metrics --service-token $service_token --url $url
+  /usr/local/bin/sts rbac create-subject --subject $cluster_name-agent --service-token $service_token --url $url >/dev/null 2>&1
+  /usr/local/bin/sts rbac grant --subject $cluster_name-agent --permission update-metrics --service-token $service_token --url $url >/dev/null 2>&1
   resp=$(/usr/local/bin/sts service-token create --name $cluster_name --roles $cluster_name-agent --service-token $service_token --url $url -o json)
   echo $resp | jq -r '."service-token".token'
 }
