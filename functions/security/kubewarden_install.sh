@@ -2,6 +2,11 @@ install_kubewarden() {
   appco_username=$1
   appco_token=$2
 
+  if [ -z "$appco_username" ] || [ -z "$appco_token" ]; then
+    echo ">> APPCO credentials not provided, stopping"
+    return 1
+  fi
+
   echo ">> Install Kubewarden Security Platform"
   helm repo add kubewarden https://charts.kubewarden.io
   helm repo update
