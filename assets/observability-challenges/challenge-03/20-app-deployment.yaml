@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: asteroid-detector
+  namespace: rodeo-lab-3
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: asteroid-detector
+  template:
+    metadata:
+      labels:
+        app: asteroid-detector
+    spec:
+      containers:
+      - name: asteroid-detector
+        image: node:18
+        command: ["node", "/app/asteroid-detector.js"]
+        volumeMounts:
+        - name: app-code
+          mountPath: /app
+          readOnly: true
+        env:
+        - name: NODE_ENV
+          value: "production"
+        - name: SCANNING_LOCATION
+          valueFrom:
+            configMapKeyRef:
+              key: scanning_location
+              name: asteroid-detector-config
+        resources:
+          requests:
+            cpu: "100m"
+            memory: "64Mi"
+          limits:
+            cpu: "200m"
+            memory: "128Mi"
+      volumes:
+      - name: app-code
+        configMap:
+          name: asteroid-detector-app-code

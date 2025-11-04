@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gravitational-accelerator
+  namespace: rodeo-lab-1
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: gravitational-accelerator
+  template:
+    metadata:
+      labels:
+        app: gravitational-accelerator
+    spec:
+      containers:
+      - name: gravitational-accelerator
+        image: node:18
+        command: ["/bin/sh", "-c"]
+        args:
+          - |
+            npm install @opentelemetry/api \
+              @opentelemetry/sdk-node \
+              @opentelemetry/instrumentation-http \
+              @opentelemetry/auto-instrumentations-node \
+              @opentelemetry/exporter-prometheus &&
+            node /app/app.js
+        env:
+        - name: MAINTENANCE_MODE
+          value: "false"
+        - name: OTEL_EXPORTER_PROMETHEUS_PORT
+          value: "9464"
+        resources:
+          requests:
+            memory: "64Mi"   # Requests 64Mi of memory
+            cpu: "100m"      # Requests 100 millicores of CPU
+          limits:
+            memory: "128Mi"  # Limits memory usage to 128Mi
+            cpu: "200m"      # Limits CPU usage to 200 millicores
+        volumeMounts:
+        - name: app-code
+          mountPath: /app
+      volumes:
+      - name: app-code
+        configMap:
+          name: gravitational-accelerator-code

@@ -1,0 +1,27 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: asteroid-detector-app-code
+  namespace: rodeo-lab-3
+data:
+  asteroid-detector.js: |
+    const location = process.env.SCANNING_LOCATION;
+
+    console.log('Asteroid Detector starting up...');
+
+    setInterval(() => {
+      console.log(`Scanning for asteroids in location: ${location}`);
+      if (location === 'Alpha Centauri') {
+        console.log('[ERROR] Asteroid swarm detected! 🌠');
+      }
+    }, 10000); // Check every 5 seconds
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: asteroid-detector-config
+  namespace: rodeo-lab-3
+  labels:
+    challenge: asteroid-detector
+data:
+  scanning_location: "Alpha Centauri"

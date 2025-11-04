@@ -1,0 +1,75 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: gravitational-accelerator-code
+  namespace: rodeo-lab-1
+data:
+  gravitational-accelerator.js: |
+    const http = require('http');
+    const { diag, DiagConsoleLogger, DiagLogLevel } = require('@opentelemetry/api');
+    const { NodeSDK } = require('@opentelemetry/sdk-node');
+    const { HttpInstrumentation } = require('@opentelemetry/instrumentation-http');
+    const { getNodeAutoInstrumentations } = require('@opentelemetry/auto-instrumentations-node');
+    const { PrometheusExporter } = require('@opentelemetry/exporter-prometheus');
+
+    // Enable OpenTelemetry logs (Optional)
+    diag.setLogger(new DiagConsoleLogger(), DiagLogLevel.INFO);
+
+    // Set up OpenTelemetry
+    const sdk = new NodeSDK({
+      instrumentations: [new HttpInstrumentation(), getNodeAutoInstrumentations()],
+      metricExporter: new PrometheusExporter({ port: 9464 }),
+    });
+
+    sdk.start();
+
+    // Read environment variable for maintenance mode
+    const MAINTENANCE_MODE = process.env.MAINTENANCE_MODE === 'true';
+
+    // Create HTTP server
+    const server = http.createServer((req, res) => {
+      if (MAINTENANCE_MODE) {
+        console.log('[ERROR] Gravitational Accelerators are offline, Maintenance mode is active. Returning 503 Service Unavailable.');
+        res.writeHead(503, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({
+          message: 'The Gravitational Accelerator is currently in maintenance mode. Please try again later.',
+        }));
+      } else {
+        console.log('Gravitational Accelerator is generating gravitational waves.');
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({
+          message: 'Gravitational Accelerator is running normally.',
+        }));
+      }
+    });
+    const PORT = 8080;
+    console.log('Starting Gravitational Accelerator...');
+    console.log(`Gravitational Accelerator started. Listening on port ${PORT}.`);
+    server.listen(PORT, () => {
+      console.log(`🚀 Generating gravitational waves at http://localhost:${PORT}/`);
+      console.log(`📊 OpenTelemetry metrics available at http://localhost:9464/metrics`);
+    });
+
+    // Graceful shutdown
+    process.on('SIGTERM', async () => {
+      await sdk.shutdown();
+      process.exit(0);
+    });
+  scenario.ts: |
+    import http from 'k6/http';
+    import { check, sleep } from 'k6';
+
+    export let options = {
+      vus: 1,
+      stages: [
+        { duration: '2m', target: 0 },
+        { duration: '30s', target: 4 },
+        { duration: '2h', target: 4 }, // long enough for lab to continue running.
+      ],
+    };
+
+    export default function () {
+      let res = http.get('http://gravitational-accelerator.rodeo-lab-1.svc.cluster.local:8080');
+      check(res, { 'Tardis operational': (r) => r.status === 200 });
+      sleep(1);
+    }

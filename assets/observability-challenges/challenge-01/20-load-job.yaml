@@ -1,0 +1,24 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: gravitational-accelerator-probe
+  namespace: rodeo-lab-1
+spec:
+  template:
+    metadata:
+      name: gravitational-accelerator-probe
+      labels:
+        app: gravitational-accelerator-probe
+    spec:
+      containers:
+      - name: k6
+        image: grafana/k6:latest
+        command: ["k6", "run", "/scripts/scenario.ts"]
+        volumeMounts:
+        - name: k6-script
+          mountPath: /scripts
+      restartPolicy: Never
+      volumes:
+      - name: k6-script
+        configMap:
+          name: gravitational-accelerator-code
