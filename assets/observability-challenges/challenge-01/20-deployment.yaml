@@ -2,7 +2,9 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: gravitational-accelerator
-  namespace: rodeo-lab-1
+  namespace: gravity-systems
+  labels:
+    app: gravitational-accelerator
 spec:
   replicas: 1
   selector:

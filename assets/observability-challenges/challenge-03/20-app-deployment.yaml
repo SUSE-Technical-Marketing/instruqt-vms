@@ -2,7 +2,9 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: asteroid-detector
-  namespace: rodeo-lab-3
+  namespace: sensor-array
+  labels:
+    app: asteroid-detector
 spec:
   replicas: 1
   selector:

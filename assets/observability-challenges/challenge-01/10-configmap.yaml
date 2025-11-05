@@ -2,7 +2,9 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: gravitational-accelerator-code
-  namespace: rodeo-lab-1
+  namespace: gravity-systems
+  labels:
+    app: gravitational-accelerator
 data:
   gravitational-accelerator.js: |
     const http = require('http');
@@ -46,7 +48,7 @@ data:
     };
 
     export default function () {
-      let res = http.get('http://gravitational-accelerator.rodeo-lab-1.svc.cluster.local:8080');
+      let res = http.get('http://gravitational-accelerator.gravity-systems.svc.cluster.local:8080');
       check(res, { 'Tardis operational': (r) => r.status === 200 });
       sleep(1);
     }

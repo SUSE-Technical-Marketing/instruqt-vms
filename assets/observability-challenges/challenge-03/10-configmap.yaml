@@ -2,7 +2,9 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: asteroid-detector-app-code
-  namespace: rodeo-lab-3
+  namespace: sensor-array
+  labels:
+    challenge: asteroid-detector
 data:
   asteroid-detector.js: |
     const location = process.env.SCANNING_LOCATION;
@@ -20,7 +22,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: asteroid-detector-config
-  namespace: rodeo-lab-3
+  namespace: sensor-array
   labels:
     challenge: asteroid-detector
 data:
