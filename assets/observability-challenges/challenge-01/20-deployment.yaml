@@ -16,20 +16,10 @@ spec:
       containers:
       - name: gravitational-accelerator
         image: node:18
-        command: ["/bin/sh", "-c"]
-        args:
-          - |
-            npm install @opentelemetry/api \
-              @opentelemetry/sdk-node \
-              @opentelemetry/instrumentation-http \
-              @opentelemetry/auto-instrumentations-node \
-              @opentelemetry/exporter-prometheus &&
-            node /app/app.js
+        command: ["node", "/app/gravitational-accelerator.js"]
         env:
         - name: MAINTENANCE_MODE
           value: "false"
-        - name: OTEL_EXPORTER_PROMETHEUS_PORT
-          value: "9464"
         resources:
           requests:
             memory: "64Mi"   # Requests 64Mi of memory

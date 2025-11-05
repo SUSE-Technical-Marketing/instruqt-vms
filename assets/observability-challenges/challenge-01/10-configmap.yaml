@@ -6,29 +6,13 @@ metadata:
 data:
   gravitational-accelerator.js: |
     const http = require('http');
-    const { diag, DiagConsoleLogger, DiagLogLevel } = require('@opentelemetry/api');
-    const { NodeSDK } = require('@opentelemetry/sdk-node');
-    const { HttpInstrumentation } = require('@opentelemetry/instrumentation-http');
-    const { getNodeAutoInstrumentations } = require('@opentelemetry/auto-instrumentations-node');
-    const { PrometheusExporter } = require('@opentelemetry/exporter-prometheus');
 
-    // Enable OpenTelemetry logs (Optional)
-    diag.setLogger(new DiagConsoleLogger(), DiagLogLevel.INFO);
+    // Get maintenance mode status from the environment variable
+    const maintenanceMode = process.env.MAINTENANCE_MODE === 'true';
 
-    // Set up OpenTelemetry
-    const sdk = new NodeSDK({
-      instrumentations: [new HttpInstrumentation(), getNodeAutoInstrumentations()],
-      metricExporter: new PrometheusExporter({ port: 9464 }),
-    });
-
-    sdk.start();
-
-    // Read environment variable for maintenance mode
-    const MAINTENANCE_MODE = process.env.MAINTENANCE_MODE === 'true';
-
-    // Create HTTP server
+    // Server logic
     const server = http.createServer((req, res) => {
-      if (MAINTENANCE_MODE) {
+      if (maintenanceMode) {
         console.log('[ERROR] Gravitational Accelerators are offline, Maintenance mode is active. Returning 503 Service Unavailable.');
         res.writeHead(503, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({
@@ -42,19 +26,12 @@ data:
         }));
       }
     });
+
+    // Simulate a startup delay
     const PORT = 8080;
     console.log('Starting Gravitational Accelerator...');
     console.log(`Gravitational Accelerator started. Listening on port ${PORT}.`);
-    server.listen(PORT, () => {
-      console.log(`🚀 Generating gravitational waves at http://localhost:${PORT}/`);
-      console.log(`📊 OpenTelemetry metrics available at http://localhost:9464/metrics`);
-    });
-
-    // Graceful shutdown
-    process.on('SIGTERM', async () => {
-      await sdk.shutdown();
-      process.exit(0);
-    });
+    server.listen(PORT, () => console.log(`Generating gravitational waves at http://0.0.0.0:${PORT}`));
   scenario.ts: |
     import http from 'k6/http';
     import { check, sleep } from 'k6';
