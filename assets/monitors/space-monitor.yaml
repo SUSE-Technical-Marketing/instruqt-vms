@@ -1,0 +1,50 @@
+nodes:
+  - _type: MonitorFunction
+    id: -2
+    description: |-
+      Mysterious Space Monitor Function
+    name: Space Monitor Function
+    parameters: []
+    identifier: urn:system:default:monitor-function:space-monitor
+    script:
+      _type: ScriptFunctionBody
+      scriptBody: |-
+        TopologyStream.query('label = "stackpack:kubernetes" and type = "pod" and label = "app:asteroid-detector"')
+        .map { pod -> [id: pod.id, identifier: pod.identifiers[0], creationTimestamp: pod.properties.creationTimestamp, podLUT: pod.lastUpdateTimestamp] }
+        .collectStream(1000, false).thenCollect { pod ->
+            q = "(withNeighborsOf(direction = 'down', components = (id = '${pod.id}'), levels = '1')) and type = 'configmap' and label = 'challenge:asteroid-detector'";
+            Topology.query(q).components().thenCollect { configMap ->
+                [ 'identifier': pod.identifier, 'podCreation': Time.epochMs(pod.creationTimestamp), 'podLUT': pod.podLUT, 'configmapLUT': configMap.lastUpdateTimestamp, 'configmapName': configMap.name]
+            }
+        }.thenStream { response ->
+            response.flatten()
+        }
+        .then { response ->
+            def health = (response.podCreation < response.configmapLUT) ? "CRITICAL" : "CLEAR";
+            def healthId = response.identifier + "_" + response.configmapName;
+            if (health == "CLEAR") {
+                return [ _type: "MonitorHealthState", id: healthId, state: health, message: "No anomalies detected", topologyIdentifier: response.identifier  ];
+            }
+            return [ _type: "MonitorHealthState", id: healthId, state: health, message: "Anomaly detected, please investigate...", topologyIdentifier: response.identifier  ];
+        }
+  - _type: Monitor
+    name: Space Monitor
+    identifier: urn:system:default:monitor:space-monitor
+    function: -2
+    arguments: []
+    intervalSeconds: 30
+    remediationHint: |-
+      ## WARNING: Asteroid Rain Detected!
+
+      However, when you look out of the window you see no asteroids at all. You start to wonder whether the Asteroid Detector is actually monitoring the correct planet.
+
+      Go figure out what went wrong with the Asteroid Detector, and why it is detecting asteroids where there are none.
+
+      You might want to start with taking a look at the logs of the Asteroid Detector, and see if there are any hints there.
+      And next you might want to take a look at the configuration. Maybe the Asteroid Detector is configured to detect asteroids on the wrong planet.
+
+      Good luck solving this issue while all those sirens are blaring!
+    status: ENABLED
+    tags:
+      - configmaps
+      - pods
