@@ -67,7 +67,11 @@ done
 
 # # Wait for certificate to be issued
 kubectl wait --for=condition=Ready certificate rancher-tls -n cattle-system --timeout=300s
-
+if [ $? -ne 0 ]; then
+  echo "Error: Timeout waiting for Rancher TLS certificate to be issued"
+  kubectl describe certificate rancher-tls -n cattle-system
+  exit 1
+fi
 # Wait for Rancher deployment to be ready
 echo ">>> Waiting for Rancher deployment to be ready"
 kubectl wait --for=condition=Available deployment/rancher -n cattle-system --timeout=300s
