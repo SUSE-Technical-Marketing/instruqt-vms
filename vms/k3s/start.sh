@@ -34,3 +34,7 @@ kubectl wait --for=condition=Ready --timeout=300s cluster.provisioning.cattle.io
 
 # Switch to downstream cluster
 unset KUBECONFIG
+
+# Wait for the rancher-webhook deployment to be ready
+echo "Waiting for rancher-webhook deployment to be ready..."
+kubectl wait --for=condition=Available --timeout=300s deployment/rancher-webhook -n cattle-system
