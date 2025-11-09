@@ -20,6 +20,13 @@ export RANCHER_API_URL="${RANCHER_URL}/v3"
 export RANCHER_ADMIN="admin"
 export RANCHER_ADMIN_PASSWORD="$(tr -dc '[:alnum:]' </dev/urandom | head -c 13; echo '69')"
 
+echo "--------------------------------"
+echo "Rancher Configuration Details:"
+echo "Rancher URL: ${RANCHER_URL}"
+echo "Rancher Admin Username: ${RANCHER_ADMIN}"
+echo "Rancher Admin Password: ${RANCHER_ADMIN_PASSWORD}"
+echo "--------------------------------"
+
 # Set variables for the instructions and passing down to other scripts
 agent variable set "RANCHER_ADMIN" "$RANCHER_ADMIN"
 agent variable set "RANCHER_ADMIN_PASSWORD" "$RANCHER_ADMIN_PASSWORD"
