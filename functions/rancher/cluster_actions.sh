@@ -193,7 +193,13 @@ rancher_create_customcluster() {
 rancher_return_clusterid() {
   local name=$1
 
-  kubectl get cluster.provisioning.cattle.io -n fleet-default -o=jsonpath="{range .items[?(@.metadata.name==\"${name}\")]}{.status.clusterName}{end}"
+  cluster_id=$(kubectl get cluster.provisioning.cattle.io -n fleet-default -o=jsonpath="{range .items[?(@.metadata.name==\"${name}\")]}{.status.clusterName}{end}")
+  until [[ "${cluster_id}" != "" ]]; do
+    echo "Waiting for cluster ID to be assigned..."
+    sleep 2
+    cluster_id=$(kubectl get cluster.provisioning.cattle.io -n fleet-default -o=jsonpath="{range .items[?(@.metadata.name==\"${name}\")]}{.status.clusterName}{end}")
+  done
+  echo "${cluster_id}"
 }
 
 #######################################
