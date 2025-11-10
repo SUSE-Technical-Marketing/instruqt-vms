@@ -43,7 +43,7 @@ data:
       stages: [
         { duration: '2m', target: 0 },
         { duration: '30s', target: 4 },
-        { duration: '2h', target: 4 }, // long enough for lab to continue running.
+        { duration: '6h', target: 4 }, // long enough for lab to continue running.
       ],
     };
 
