@@ -49,6 +49,6 @@ data:
 
     export default function () {
       let res = http.get('http://gravitational-accelerator.gravity-systems.svc.cluster.local:8080');
-      check(res, { 'Tardis operational': (r) => r.status === 200 });
+      check(res, { 'Gravity operational': (r) => r.status === 200 });
       sleep(1);
     }
