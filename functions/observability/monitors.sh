@@ -8,7 +8,7 @@ observability_disable_monitor() {
 }
 
 observability_deploy_monitor() {
-    local file $1
+    local file=$1
     local url=$2
     local service_token=$3
     /usr/local/bin/sts monitor apply -f $file --service-token $service_token --url $url
