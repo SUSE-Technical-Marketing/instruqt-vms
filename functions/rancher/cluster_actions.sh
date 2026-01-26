@@ -195,7 +195,7 @@ rancher_return_clusterid() {
 
   cluster_id=$(kubectl get cluster.provisioning.cattle.io -n fleet-default -o=jsonpath="{range .items[?(@.metadata.name==\"${name}\")]}{.status.clusterName}{end}")
   until [[ "${cluster_id}" != "" ]]; do
-    echo "Waiting for cluster ID to be assigned..."
+    echo "Waiting for cluster ID to be assigned..." >&2
     sleep 2
     cluster_id=$(kubectl get cluster.provisioning.cattle.io -n fleet-default -o=jsonpath="{range .items[?(@.metadata.name==\"${name}\")]}{.status.clusterName}{end}")
   done
@@ -222,6 +222,7 @@ rancher_return_clusterregistrationmanifest() {
   local cluster_id=$1
 
   until kubectl get clusterregistrationtokens.management.cattle.io -n ${cluster_id} default-token &>/dev/null; do
+    echo "Waiting for ClusterRegistrationToken for ${cluster_id} to be created..." >&2
     sleep 5
   done
 

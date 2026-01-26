@@ -25,6 +25,6 @@ enhanced_loading: null
 
 Rancher admin password:
 
-```txt
+```text
 [[ Instruqt-Var key="RANCHER_ADMIN_PASSWORD" hostname="manager" ]]
 ```

@@ -33,12 +33,12 @@ enhanced_loading: null
 
 Rancher admin password:
 
-```txt
+```text
 [[ Instruqt-Var key="RANCHER_ADMIN_PASSWORD" hostname="manager" ]]
 ```
 
 Observability admin password:
 
-```txt
+```text
 [[ Instruqt-Var key="OBSERVABILITY_ADMIN_PASSWORD" hostname="ops" ]]
 ```
