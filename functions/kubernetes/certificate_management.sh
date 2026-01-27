@@ -26,8 +26,6 @@ k8s_install_certmanager() {
 }
 
 k8s_install_sprouter() {
-  local version=$1
-
   echo 'Installing Sprouter...'
   helm install sprouter -n sprouter --create-namespace oci://ghcr.io/hierynomus/sprouter/charts/sprouter
   if [ $? -ne 0 ]; then
@@ -40,7 +38,7 @@ k8s_install_sprouter() {
 k8s_create_wildcardtlssecret() {
   local certFile=$1
   local keyFile=$2
-  local secretName=${4:-wildcard-tls}
+  local secretName=${3:-wildcard-tls}
 
   echo "Creating wildcard TLS secret..."
   kubectl create secret tls ${secretName} --cert=${certFile} --key=${keyFile}
