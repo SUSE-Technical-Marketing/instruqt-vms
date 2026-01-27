@@ -40,14 +40,22 @@ rancherprime_install_withcertmanagerclusterissuer() {
 rancher_create_ingress() {
   local ingressClass=$1
   local hostname=$2
-
+  local certIssuer=${3:-letsencrypt-prod}
+  local secretName=${4:-rancher-tls}
   echo "Creating Ingress for Rancher..."
+
+  if [ "$certIssuer" == "none" ]; then
+    extraAnnotations=""
+  else
+    extraAnnotations="cert-manager.io/cluster-issuer: ${certIssuer}"
+  fi
+
   kubectl apply -f - <<EOF
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   annotations:
-    cert-manager.io/cluster-issuer: letsencrypt-prod
+    ${extraAnnotations}
     nginx.ingress.kubernetes.io/proxy-connect-timeout: "30"
     nginx.ingress.kubernetes.io/proxy-read-timeout: "1800"
     nginx.ingress.kubernetes.io/proxy-send-timeout: "1800"
@@ -71,7 +79,7 @@ spec:
   tls:
   - hosts:
     - ${hostname}
-    secretName: rancher-tls
+    secretName: ${secretName}
 EOF
 }
 

@@ -52,26 +52,38 @@ kubectl wait --for=condition=Ready pod -l app.kubernetes.io/instance=ingress-ngi
 echo ">>> Recreating Rancher Ingress"
 kubectl delete validatingwebhookconfiguration ingress-nginx-admission --ignore-not-found
 kubectl delete ingress rancher -n cattle-system --ignore-not-found
-rancher_create_ingress "nginx" "${RANCHER_DOMAIN}"
 
-# Wait until certificate to exist (can't use kubectl because the cert is not present yet)
-echo ">>> Waiting for Rancher TLS certificate to be created"
-for i in {1..60}; do
-  if kubectl get certificate rancher-tls -n cattle-system &>/dev/null; then
-    echo "Rancher TLS certificate is ready"
-    break
+
+if [ "$USE_INSTRUQT_SSL_CERTIFICATE" == "true" ]; then
+  echo ">>> Using Instruqt provided SSL certificate"
+  download_gcp_certificate sandbox.crt sandbox.key
+  k8s_install_sprouter
+  k8s_create_wildcardtlssecret sandbox.crt sandbox.key wildcard-tls
+  rancher_create_ingress "nginx" "${RANCHER_DOMAIN}" "none" "wildcard-tls"
+else
+  echo ">>> Using Cert-Manager provided SSL certificate"
+  rancher_create_ingress "nginx" "${RANCHER_DOMAIN}" "letsencrypt-prod" "rancher-tls"
+  # Wait until certificate to exist (can't use kubectl because the cert is not present yet)
+  echo ">>> Waiting for Rancher TLS certificate to be created"
+  for i in {1..60}; do
+    if kubectl get certificate rancher-tls -n cattle-system &>/dev/null; then
+      echo "Rancher TLS certificate is ready"
+      break
+    fi
+    echo "Waiting for Rancher TLS certificate to be created..."
+    sleep 5
+  done
+
+  # # Wait for certificate to be issued
+  if ! kubectl wait --for=condition=Ready certificate rancher-tls -n cattle-system --timeout=300s; then
+    echo "Error: Timeout waiting for Rancher TLS certificate to be issued"
+    kubectl describe certificate rancher-tls -n cattle-system
+    kubectl describe order rancher-tls -n cattle-system
+    exit 1
   fi
-  echo "Waiting for Rancher TLS certificate to be created..."
-  sleep 5
-done
-
-# # Wait for certificate to be issued
-if ! kubectl wait --for=condition=Ready certificate rancher-tls -n cattle-system --timeout=300s; then
-  echo "Error: Timeout waiting for Rancher TLS certificate to be issued"
-  kubectl describe certificate rancher-tls -n cattle-system
-  kubectl describe order rancher-tls -n cattle-system
-  exit 1
 fi
+
+
 
 # Wait for Rancher deployment to be ready
 echo ">>> Waiting for Rancher deployment to be ready"

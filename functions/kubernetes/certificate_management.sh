@@ -37,6 +37,20 @@ k8s_install_sprouter() {
   kubectl wait pods -n sprouter -l app.kubernetes.io/instance=sprouter --for condition=Ready 2>/dev/null
 }
 
+k8s_create_wildcardtlssecret() {
+  local certFile=$1
+  local keyFile=$2
+  local secretName=${4:-wildcard-tls}
+
+  echo "Creating wildcard TLS secret..."
+  kubectl create secret tls ${secretName} --cert=${certFile} --key=${keyFile}
+  if [ $? -ne 0 ]; then
+    echo "Failed to create wildcard TLS secret"
+    exit 1
+  fi
+  kubectl annotate secret ${secretName} sprouter.geeko.me/enabled="true"
+}
+
 #######################################
 # Create certificate cluster issuers using Let's Encrypt
 # Arguments:
