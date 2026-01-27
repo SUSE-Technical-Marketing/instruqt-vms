@@ -37,7 +37,6 @@ kubectl wait --for=condition=Ready pod -l app.kubernetes.io/instance=ingress-ngi
 kubectl delete validatingwebhookconfiguration ingress-nginx-admission --ignore-not-found
 kubectl delete ingress suse-observability -n suse-observability --ignore-not-found
 
-
 export OBSERVABILITY_ADMIN_PASSWORD="$(tr -dc '[:alnum:]' </dev/urandom | head -c 13; echo '69')"
 agent variable set OBSERVABILITY_ADMIN_PASSWORD "${OBSERVABILITY_ADMIN_PASSWORD}"
 

@@ -25,6 +25,18 @@ k8s_install_certmanager() {
   kubectl wait pods -n cert-manager -l app.kubernetes.io/instance=cert-manager --for condition=Ready 2>/dev/null
 }
 
+k8s_install_sprouter() {
+  local version=$1
+
+  echo 'Installing Sprouter...'
+  helm install sprouter -n sprouter --create-namespace oci://ghcr.io/hierynomus/sprouter/charts/sprouter
+  if [ $? -ne 0 ]; then
+    echo "Failed to install SProuter"
+    exit 1
+  fi
+  kubectl wait pods -n sprouter -l app.kubernetes.io/instance=sprouter --for condition=Ready 2>/dev/null
+}
+
 #######################################
 # Create certificate cluster issuers using Let's Encrypt
 # Arguments:
