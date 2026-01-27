@@ -4,6 +4,14 @@ security_values() {
   local cluster_name=${3}
   local username=${4:-admin}
   local password=${5:-admin}
+  local certIssuer=${6:-letsencrypt-prod}
+  local secretName=${7:-neuvector-tls}
+
+  if [ "$certIssuer" == "none" ]; then
+    extraAnnotations=""
+  else
+    extraAnnotations="cert-manager.io/cluster-issuer: $certIssuer"
+  fi
 
   cat << EOF > neuvector-values.yaml
 global:
@@ -19,10 +27,10 @@ manager:
     env:
       ssl: true
     annotations:
-      cert-manager.io/cluster-issuer: letsencrypt-prod
+      $extraAnnotations
       kubernetes.io/ingress.class: nginx
     host: ${hostname}
-    secretName: neuvector-tls
+    secretName: ${secretName}
   svc:
     type: ClusterIP
 k3s:
