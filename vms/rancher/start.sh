@@ -54,7 +54,7 @@ kubectl delete validatingwebhookconfiguration ingress-nginx-admission --ignore-n
 kubectl delete ingress rancher -n cattle-system --ignore-not-found
 
 
-if [ "$USE_INSTRUQT_SSL_CERTIFICATE" == "true" ]; then
+if [ "${USE_INSTRUQT_SSL_CERTIFICATE:-false}" == "true" ]; then
   echo ">>> Using Instruqt provided SSL certificate"
   download_gcp_certificate sandbox.crt sandbox.key
   k8s_install_sprouter

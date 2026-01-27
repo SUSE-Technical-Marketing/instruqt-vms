@@ -15,6 +15,22 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 echo "Script directory: ${SCRIPT_DIR}"
 . $SCRIPT_DIR/../../functions/index.sh
 
+export OBSERVABILITY_ADMIN_PASSWORD="$(tr -dc '[:alnum:]' </dev/urandom | head -c 13; echo '69')"
+agent variable set OBSERVABILITY_ADMIN_PASSWORD "${OBSERVABILITY_ADMIN_PASSWORD}"
+
+if [ -z "${OBSERVABILITY_LICENSE}" ]; then
+  fail-message "OBSERVABILITY_LICENSE is not set. Please provide a valid license."
+fi
+
+# Ensure the observability service token is set
+if [ -z "${OBSERVABILITY_SERVICE_TOKEN}" ]; then
+  fail-message "OBSERVABILITY_SERVICE_TOKEN is not set. Please provide a valid service token."
+fi
+
+# Ensure the observability host is set
+if [ -z "${OBSERVABILITY_HOST}" ]; then
+  fail-message "OBSERVABILITY_HOST is not set. Please provide a valid host."
+fi
 
 echo ">>> Waiting for kubernetes to be running"
 for i in {1..60}; do
@@ -37,24 +53,16 @@ kubectl wait --for=condition=Ready pod -l app.kubernetes.io/instance=ingress-ngi
 kubectl delete validatingwebhookconfiguration ingress-nginx-admission --ignore-not-found
 kubectl delete ingress suse-observability -n suse-observability --ignore-not-found
 
-export OBSERVABILITY_ADMIN_PASSWORD="$(tr -dc '[:alnum:]' </dev/urandom | head -c 13; echo '69')"
-agent variable set OBSERVABILITY_ADMIN_PASSWORD "${OBSERVABILITY_ADMIN_PASSWORD}"
-
-if [ -z "${OBSERVABILITY_LICENSE}" ]; then
-  fail-message "OBSERVABILITY_LICENSE is not set. Please provide a valid license."
+if [ "${USE_INSTRUQT_SSL_CERTIFICATE:-false}" == "true" ]; then
+  echo ">>> Using Instruqt provided SSL certificate"
+  download_gcp_certificate sandbox.crt sandbox.key
+  k8s_install_sprouter
+  k8s_create_wildcardtlssecret sandbox.crt sandbox.key wildcard-tls
+  observability_generate_values "${OBSERVABILITY_LICENSE}" "${OBSERVABILITY_HOST}" "${OBSERVABILITY_ADMIN_PASSWORD}" "${OBSERVABILITY_SERVICE_TOKEN}" "none" "wildcard-tls"
+else
+  observability_generate_values "${OBSERVABILITY_LICENSE}" "${OBSERVABILITY_HOST}" "${OBSERVABILITY_ADMIN_PASSWORD}" "${OBSERVABILITY_SERVICE_TOKEN}"
 fi
 
-# Ensure the observability service token is set
-if [ -z "${OBSERVABILITY_SERVICE_TOKEN}" ]; then
-  fail-message "OBSERVABILITY_SERVICE_TOKEN is not set. Please provide a valid service token."
-fi
-
-# Ensure the observability host is set
-if [ -z "${OBSERVABILITY_HOST}" ]; then
-  fail-message "OBSERVABILITY_HOST is not set. Please provide a valid host."
-fi
-
-observability_generate_values "${OBSERVABILITY_LICENSE}" "${OBSERVABILITY_HOST}" "${OBSERVABILITY_ADMIN_PASSWORD}" "${OBSERVABILITY_SERVICE_TOKEN}"
 observability_install_server $OBSERVABILITY_VERSION true
 if [ $? -ne 0 ]; then
   kubectl get pods -n suse-observability

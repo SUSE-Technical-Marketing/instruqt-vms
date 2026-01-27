@@ -8,8 +8,15 @@ observability_generate_values() {
     local host=$2
     local admin_password=$3
     local service_token=$4
-
+    local certIssuer=${5:-letsencrypt-prod}
+    local secretName=${6:-tls-secret}
     local values_dir=.
+
+    if [ "$certIssuer" == "none" ]; then
+      extraAnnotations=""
+    else
+      extraAnnotations="cert-manager.io/cluster-issuer: $certIssuer"
+    fi
 
     helm template --set license=$license \
         --set baseUrl="https://$host" \
@@ -23,7 +30,7 @@ observability_generate_values() {
 ingress:
   enabled: true
   annotations:
-    cert-manager.io/cluster-issuer: letsencrypt-prod
+    $extraAnnotations
     nginx.ingress.kubernetes.io/proxy-body-size: "50m"
   ingressClassName: nginx
   hosts:
@@ -31,7 +38,7 @@ ingress:
   tls:
     - hosts:
         - $host
-      secretName: tls-secret
+      secretName: $secretName
 EOF
 
     rm -f $values_dir/suse-observability-values/templates/bootstrap_token.yaml
