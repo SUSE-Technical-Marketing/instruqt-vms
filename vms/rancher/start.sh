@@ -59,6 +59,15 @@ if [ "${USE_INSTRUQT_SSL_CERTIFICATE:-false}" == "true" ]; then
   download_gcp_certificate sandbox.crt sandbox.key
   k8s_install_sprouter
   k8s_create_wildcardtlssecret sandbox.crt sandbox.key wildcard-tls
+  echo ">>> Waiting for Rancher TLS certificate to be created"
+  for i in {1..60}; do
+    if kubectl get certificate wildcard-tls -n cattle-system &>/dev/null; then
+      echo "Rancher TLS certificate is ready"
+      break
+    fi
+    echo "Waiting for Rancher TLS certificate to be created..."
+    sleep 5
+  done
   rancher_create_ingress "nginx" "${RANCHER_DOMAIN}" "none" "wildcard-tls"
 else
   echo ">>> Using Cert-Manager provided SSL certificate"
