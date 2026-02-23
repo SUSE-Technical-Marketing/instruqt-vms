@@ -28,8 +28,8 @@ k3s_copy_kubeconfig
 echo ">> Install cert-manager"
 k8s_install_certmanager "${CERTMANAGER_VERSION}"
 k8s_create_letsencryptclusterissuer "nginx" "${LETSENCRYPT_EMAIL_ADDRESS}"
-echo ">> Install Ingress Nginx"
-k8s_install_ingress_nginx
+echo ">> Install Traefik"
+k8s_install_traefik "${TRAEFIK_VERSION}"
 
 echo ">> Add completions"
 add_completions

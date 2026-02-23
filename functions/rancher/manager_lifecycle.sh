@@ -15,9 +15,10 @@ rancherprime_install_withcertmanagerclusterissuer() {
   local version=$1
   local hostname=$2
   local create_ingress=${3:-true}
+  local ingress_class=${4:-nginx}
 
   if [[ "$create_ingress" == "true" ]]; then
-    ingress_opts="--set ingress.extraAnnotations.'cert-manager\.io/cluster-issuer'=letsencrypt-prod --set ingress.ingressClassName=nginx --set ingress.tls.source=secret --set ingress.tls.secretName=rancher-tls"
+    ingress_opts="--set ingress.extraAnnotations.'cert-manager\.io/cluster-issuer'=letsencrypt-prod --set ingress.ingressClassName=${ingress_class} --set ingress.tls.source=secret --set ingress.tls.secretName=rancher-tls"
   fi
   echo "Installing Rancher..."
   helm repo add rancher-prime https://charts.rancher.com/server-charts/prime

@@ -21,13 +21,14 @@ install_tooling "${K9S_VERSION}"
 echo ">> Increase limits"
 increase_limits
 echo ">> Setup k3s"
-k3s_create_cluster "${K3S_VERSION}" "rancher-master"
+k3s_create_cluster "${K3S_VERSION}" "rancher-master" "false"
 k3s_copy_kubeconfig
-echo ">> Install Ingress Nginx"
-k8s_install_ingress_nginx
+# echo ">> Install Ingress Nginx"
+# k8s_install_ingress_nginx
+k8s_install_traefik "${TRAEFIK_VERSION}"
 echo ">> Install cert-manager"
 k8s_install_certmanager "${CERTMANAGER_VERSION}"
-k8s_create_letsencryptclusterissuer "nginx" "${LETSENCRYPT_EMAIL_ADDRESS}"
+k8s_create_letsencryptclusterissuer "traefik" "${LETSENCRYPT_EMAIL_ADDRESS}"
 
 echo ">> Install Rancher"
 rancherprime_install_withcertmanagerclusterissuer "${RANCHER_VERSION}" "rancher.test.host" false

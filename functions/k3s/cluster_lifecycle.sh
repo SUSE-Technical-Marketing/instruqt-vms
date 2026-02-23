@@ -12,9 +12,16 @@
 k3s_create_cluster() {
   local version=$1
   local node_name=$2
+  local traefik=${3:-"false"}
+
+  if [ "$traefik" == "true" ]; then
+    install_k3s_exec="--disable-network-policy"
+  else
+    install_k3s_exec="--disable=traefik --disable-network-policy"
+  fi
 
   echo 'Create management cluster (K3s)...'
-  curl -sfL https://get.k3s.io | INSTALL_K3S_SKIP_SELINUX_RPM=true INSTALL_K3S_CHANNEL="${version}" K3S_NODE_NAME="${node_name}" INSTALL_K3S_EXEC="--disable=traefik --disable-network-policy" K3S_KUBECONFIG_MODE="644" sh -
+  curl -sfL https://get.k3s.io | INSTALL_K3S_SKIP_SELINUX_RPM=true INSTALL_K3S_CHANNEL="${version}" K3S_NODE_NAME="${node_name}" INSTALL_K3S_EXEC="${install_k3s_exec}" K3S_KUBECONFIG_MODE="644" sh -
 }
 
 #######################################
