@@ -47,7 +47,7 @@ done
 echo ">>> Waiting for cert-manager to be ready"
 kubectl wait --for=condition=Ready pod -l app.kubernetes.io/instance=cert-manager -n cert-manager --timeout=300s
 echo ">>> Waiting for Traefik to be ready"
-kubectl wait --for=condition=Ready pod -l app.kubernetes.io/instance=traefik -n traefik --timeout=300s
+kubectl wait --for=condition=Ready pod -l app.kubernetes.io/name=traefik -n traefik --timeout=300s
 k8s_patch_traefik_gateway_with_host "\*.${HOSTNAME}.${_SANDBOX_ID}.instruqt.io"
 
 echo ">>> Recreating Rancher Ingress"
@@ -69,10 +69,10 @@ if [ "${USE_INSTRUQT_SSL_CERTIFICATE:-false}" == "true" ]; then
     echo "Waiting for Rancher Wildcard TLS secret to be synced..."
     sleep 5
   done
-  rancher_create_ingress "nginx" "${RANCHER_DOMAIN}" "none" "wildcard-tls"
+  rancher_create_ingress "traefik" "${RANCHER_DOMAIN}" "none" "wildcard-tls"
 else
   echo ">>> Using Cert-Manager provided SSL certificate"
-  rancher_create_ingress "nginx" "${RANCHER_DOMAIN}" "letsencrypt-prod" "rancher-tls"
+  rancher_create_ingress "traefik" "${RANCHER_DOMAIN}" "letsencrypt-prod" "rancher-tls"
   # Wait until certificate to exist (can't use kubectl because the cert is not present yet)
   echo ">>> Waiting for Rancher TLS certificate to be created"
   for i in {1..60}; do
