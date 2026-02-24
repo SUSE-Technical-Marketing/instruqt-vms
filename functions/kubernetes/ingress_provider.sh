@@ -48,6 +48,7 @@ EOF
     echo "Failed to install Traefik"
     exit 1
   fi
+  sleep 5
   kubectl wait pods -n traefik -l app.kubernetes.io/name=traefik --for condition=Ready
 }
 
