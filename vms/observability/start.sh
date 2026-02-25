@@ -46,8 +46,8 @@ done
 # Wait for cert-manager
 echo ">>> Waiting for cert-manager to be ready"
 kubectl wait --for=condition=Ready pod -l app.kubernetes.io/instance=cert-manager -n cert-manager --timeout=300s
-echo ">>> Waiting for ingress-nginx to be ready"
-kubectl wait --for=condition=Ready pod -l app.kubernetes.io/instance=ingress-nginx -n ingress-nginx --timeout=300s
+echo ">>> Waiting for Traefik to be ready"
+kubectl wait --for=condition=Ready pod -l app.kubernetes.io/name=traefik -n traefik --timeout=300s
 
 # Shortcut to not wait for the webhook to start
 kubectl delete validatingwebhookconfiguration ingress-nginx-admission --ignore-not-found

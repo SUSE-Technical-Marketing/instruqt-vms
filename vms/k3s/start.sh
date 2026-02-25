@@ -14,7 +14,7 @@ echo "Script directory: ${SCRIPT_DIR}"
 export KUBECONFIG=~/${MANAGER_HOSTNAME}-kubeconfig.yaml
 cat ~/${MANAGER_HOSTNAME}-kubeconfig.yaml
 
-k8s_patch_traefik_gateway_with_host "\*.${HOSTNAME}.${_SANDBOX_ID}.instruqt.io"
+# k8s_patch_traefik_gateway_with_host "\*.${HOSTNAME}.${_SANDBOX_ID}.instruqt.io"
 
 rancher_import_cluster ${HOSTNAME}
 CLUSTER_ID="$(rancher_return_clusterid ${HOSTNAME})"
