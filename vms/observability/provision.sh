@@ -39,4 +39,4 @@ observability_generate_values "no-license" "test.host" "dummy-password" "svctok-
 observability_install_server $OBSERVABILITY_VERSION
 
 echo ">>> Waiting for Observability Pods to be available..."
-observability_wait_for_pods
+observability_wait_for_server

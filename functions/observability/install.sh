@@ -121,6 +121,11 @@ observability_install_server() {
         suse-observability suse-observability/suse-observability
 }
 
+observability_wait_for_server() {
+    echo ">>> Waiting for Observability Server Deployment to be available..."
+    kubectl wait deployment -n suse-observability suse-observability-server --for condition=Available --timeout=300s
+}
+
 observability_wait_for_pods() {
     local namespace="suse-observability"
     echo ">>> Waiting for Observability Pods to be available..."
