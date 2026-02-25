@@ -70,7 +70,7 @@ rancher_update_password() {
   local retry_count=0
   local http_code
   local response_body
-  local last_http_code
+  local last_http_code=0
   echo 'Updates Rancher user password...'
 
   while [ $retry_count -lt $max_retries ]; do
