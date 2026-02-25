@@ -99,19 +99,19 @@ fi
 echo ">>> Waiting for Rancher deployment to be ready"
 kubectl wait --for=condition=Available deployment/rancher -n cattle-system --timeout=300s
 
-sleep 5
+# sleep 5
 
-rancher_first_login $RANCHER_URL "$RANCHER_ADMIN_PASSWORD"
-export RANCHER_BEARER_TOKEN=$(rancher_login_withpassword $RANCHER_URL $RANCHER_ADMIN "$RANCHER_ADMIN_PASSWORD")
+# rancher_first_login $RANCHER_URL "$RANCHER_ADMIN_PASSWORD"
+# export RANCHER_BEARER_TOKEN=$(rancher_login_withpassword $RANCHER_URL $RANCHER_ADMIN "$RANCHER_ADMIN_PASSWORD")
 
-KUBECONFIG=$(rancher_download_kubeconfig $RANCHER_URL $RANCHER_BEARER_TOKEN "local")
+# KUBECONFIG=$(rancher_download_kubeconfig $RANCHER_URL $RANCHER_BEARER_TOKEN "local")
 
-KUBECONFIG=$(echo "$KUBECONFIG" | jq -r ".config")
-echo "$KUBECONFIG" | yq e '.clusters[0].cluster["insecure-skip-tls-verify"] = true | .clusters[0].cluster.certificate-authority-data = "" | .clusters[0].cluster.server = "https://rancher.${HOSTNAME}.${_SANDBOX_ID}.instruqt.io/k8s/clusters/local" | .clusters[0].cluster.server |= envsubst' > ./${HOSTNAME}-kubeconfig.yaml
+# KUBECONFIG=$(echo "$KUBECONFIG" | jq -r ".config")
+# echo "$KUBECONFIG" | yq e '.clusters[0].cluster["insecure-skip-tls-verify"] = true | .clusters[0].cluster.certificate-authority-data = "" | .clusters[0].cluster.server = "https://rancher.${HOSTNAME}.${_SANDBOX_ID}.instruqt.io/k8s/clusters/local" | .clusters[0].cluster.server |= envsubst' > ./${HOSTNAME}-kubeconfig.yaml
 
-# Split DOWNSTREAM_CLUSTERS and iterate over each cluster name
-IFS=',' read -ra CLUSTERS <<< "$DOWNSTREAM_CLUSTERS"
-for CLUSTER in "${CLUSTERS[@]}"; do
-  echo ">>> Copying kubeconfig to downstream cluster: ${CLUSTER}"
-  scp -o StrictHostKeyChecking=accept-new ./${HOSTNAME}-kubeconfig.yaml ${CLUSTER}:${HOSTNAME}-kubeconfig.yaml
-done
+# # Split DOWNSTREAM_CLUSTERS and iterate over each cluster name
+# IFS=',' read -ra CLUSTERS <<< "$DOWNSTREAM_CLUSTERS"
+# for CLUSTER in "${CLUSTERS[@]}"; do
+#   echo ">>> Copying kubeconfig to downstream cluster: ${CLUSTER}"
+#   scp -o StrictHostKeyChecking=accept-new ./${HOSTNAME}-kubeconfig.yaml ${CLUSTER}:${HOSTNAME}-kubeconfig.yaml
+# done
