@@ -101,8 +101,8 @@ kubectl wait --for=condition=Available deployment/rancher -n cattle-system --tim
 
 # sleep 5
 
-# rancher_first_login $RANCHER_URL "$RANCHER_ADMIN_PASSWORD"
-# export RANCHER_BEARER_TOKEN=$(rancher_login_withpassword $RANCHER_URL $RANCHER_ADMIN "$RANCHER_ADMIN_PASSWORD")
+rancher_first_login $RANCHER_URL "$RANCHER_ADMIN_PASSWORD"
+export RANCHER_BEARER_TOKEN=$(rancher_login_withpassword $RANCHER_URL $RANCHER_ADMIN "$RANCHER_ADMIN_PASSWORD")
 
 # KUBECONFIG=$(rancher_download_kubeconfig $RANCHER_URL $RANCHER_BEARER_TOKEN "local")
 
