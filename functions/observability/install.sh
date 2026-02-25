@@ -31,8 +31,7 @@ ingress:
   enabled: true
   annotations:
     $extraAnnotations
-    nginx.ingress.kubernetes.io/proxy-body-size: "50m"
-  ingressClassName: nginx
+  ingressClassName: traefik
   hosts:
     - host: $host
   tls:
