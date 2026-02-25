@@ -33,9 +33,6 @@ k8s_install_sprouter() {
     echo "Failed to install SProuter"
     exit 1
   fi
-  # Wait for pod to be created
-  sleep 5
-  kubectl wait pods -n sprouter -l app.kubernetes.io/instance=sprouter --for condition=Ready 2>/dev/null
 }
 
 k8s_create_wildcardtlssecret() {
