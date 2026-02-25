@@ -101,6 +101,7 @@ rancher_first_login() {
   echo "DEBUG BOOTSTRAP_PASSWORD=${BOOTSTRAP_PASSWORD}"
   LOGIN_TOKEN=$(rancher_login_withpassword $rancherUrl 'admin' "$BOOTSTRAP_PASSWORD")
   echo "DEBUG LOGIN_TOKEN=${LOGIN_TOKEN}"
+  sleep 5
   rancher_update_password $rancherUrl $LOGIN_TOKEN $BOOTSTRAP_PASSWORD $newPassword
   rancher_update_serverurl $rancherUrl
 }
