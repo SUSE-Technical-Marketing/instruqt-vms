@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -exuo pipefail
+set -euo pipefail
 
 # Check in which directory the script is running
 # This is important to know because the script will be sourced in the vms directory

@@ -22,8 +22,7 @@ k8s_install_certmanager() {
     echo "Failed to install cert-manager"
     exit 1
   fi
-  sleep 5
-  kubectl wait pods -n cert-manager -l app.kubernetes.io/instance=cert-manager --for condition=Ready 2>/dev/null
+  kubectl wait deployment -n cert-manager cert-manager --for condition=Available --timeout=300s 2>/dev/null
 }
 
 k8s_install_sprouter() {
