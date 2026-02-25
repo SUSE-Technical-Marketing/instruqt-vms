@@ -98,6 +98,9 @@ rancher_update_password() {
     if [ "$last_http_code" == "503" ] && [ "$http_code" == "401"  ]; then
       echo "Unauthorized (401) - likely due to token invalidation after password change. Stopping retries." >&2
       return 0
+    elif [ "$http_code" == "422" ]; then
+      echo "Unprocessable Entity (422) - Don't know, let's try." >&2
+      return 0
     fi
 
     retry_count=$((retry_count + 1))
