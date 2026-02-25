@@ -42,14 +42,14 @@ EOF
   helm upgrade --install \
     --namespace traefik --create-namespace \
     --values traefik-values.yaml \
-    --wait \
     --version ${traefik_version} \
     traefik traefik/traefik
   if [ $? -ne 0 ]; then
     echo "Failed to install Traefik"
     exit 1
   fi
-  # kubectl wait pods -n traefik -l app.kubernetes.io/name=traefik --for condition=Ready
+  # Wait for traefik deployment to be ready
+  kubectl wait deployment -n traefik traefik --for condition=Available --timeout=300s
 }
 
 k8s_patch_traefik_gateway_with_host() {
