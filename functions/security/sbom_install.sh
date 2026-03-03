@@ -11,12 +11,13 @@ install_sbom_scanner() {
     echo ">> Install SBOM Scanner"
     helm repo add kubewarden https://charts.kubewarden.io
     helm repo update
-    helm install sbomscanner kubewarden/sbomscanner \
+    helm upgrade -i sbomscanner kubewarden/sbomscanner \
     --namespace sbomscanner \
     --create-namespace \
     --set controller.replicas=1 \
     --set storage.replicas=1 \
     --set storage.postgres.cnpg.instances=1 \
     --set worker.replicas=1 \
+    --devel \
     --wait
 }
