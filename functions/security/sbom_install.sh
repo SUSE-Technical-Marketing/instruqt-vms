@@ -8,7 +8,7 @@ install_sbom_scanner() {
     --wait \
     cnpg/cloudnative-pg
 
-    echo ">> Install SBOM Scanner Polaris"
+    echo ">> Install SBOM Scanner"
     helm repo add kubewarden https://charts.kubewarden.io
     helm repo update
     helm install sbomscanner kubewarden/sbomscanner \
