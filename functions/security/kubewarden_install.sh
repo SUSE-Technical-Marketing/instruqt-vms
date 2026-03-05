@@ -1,4 +1,12 @@
 install_kubewarden() {
+  appco_username=$1
+  appco_token=$2
+
+  install_kubewarden_core
+  install_kubewarden_defaults "$appco_username" "$appco_token"
+}
+
+install_kubewarden_core() {
   echo ">> Install Kubewarden Security Platform"
   helm repo add kubewarden https://charts.kubewarden.io
   helm repo update

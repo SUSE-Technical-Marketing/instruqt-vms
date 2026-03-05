@@ -32,11 +32,10 @@ echo ">> Install Traefik"
 k8s_install_traefik "${TRAEFIK_VERSION}"
 
 install_sbom_scanner
-install_kubewarden
+install_kubewarden_core
 k8s_install_sprouter
 
 observability_install_cli
-
 
 echo ">> Add completions"
 add_completions
