@@ -6,7 +6,7 @@ install_sbom_scanner() {
     --namespace cnpg-system \
     --create-namespace \
     --wait \
-    ./instruqt-vms/assets/charts/cloud-native-pg-$CNPG_VERSION.tgz
+    ./instruqt-vms/assets/charts/cloudnative-pg-$CNPG_VERSION.tgz
 
     echo ">> Install SBOM Scanner"
     helm repo add kubewarden https://charts.kubewarden.io
