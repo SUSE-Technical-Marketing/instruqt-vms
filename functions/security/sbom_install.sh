@@ -1,7 +1,10 @@
 install_sbom_scanner() {
+    # echo ">> Adding Helm Repos for SBOMScanner"
+    # helm repo add cnpg https://cloudnative-pg.github.io/charts
+    # helm repo add kubewarden https://charts.kubewarden.io
+    # helm repo update
+
     echo ">> Install Cloud Native Postgres Operator"
-    helm repo add cnpg https://cloudnative-pg.github.io/charts
-    helm repo update
     helm install cnpg \
     --namespace cnpg-system \
     --create-namespace \
@@ -9,8 +12,6 @@ install_sbom_scanner() {
     ./instruqt-vms/assets/charts/cloudnative-pg-$CNPG_VERSION.tgz
 
     echo ">> Install SBOM Scanner"
-    helm repo add kubewarden https://charts.kubewarden.io
-    helm repo update
     helm upgrade -i sbomscanner ./instruqt-vms/assets/charts/sbomscanner-$SBOM_SCANNER_VERSION.tgz \
     --namespace sbomscanner \
     --create-namespace \
