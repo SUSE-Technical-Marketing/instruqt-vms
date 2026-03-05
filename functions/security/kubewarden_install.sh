@@ -11,6 +11,7 @@ install_kubewarden_core() {
   helm repo add kubewarden https://charts.kubewarden.io
   helm repo update
 
+  kubectl create namespace kubewarden
   helm install -n kubewarden kubewarden-crds ./instruqt-vms/assets/charts/kubewarden-crds-$KUBEWARDEN_CRDS_VERSION.tgz
   helm install --wait -n kubewarden kubewarden-controller ./instruqt-vms/assets/charts/kubewarden-controller-$KUBEWARDEN_CONTROLLER_VERSION.tgz
 }
