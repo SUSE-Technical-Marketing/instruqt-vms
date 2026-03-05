@@ -9,6 +9,8 @@ done
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 
 echo "Script directory: ${SCRIPT_DIR}"
+. "${SCRIPT_DIR}/../../env"
+# Source functions
 . $SCRIPT_DIR/../../functions/index.sh
 
 export KUBECONFIG=~/${MANAGER_HOSTNAME}-kubeconfig.yaml

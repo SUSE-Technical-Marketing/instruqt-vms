@@ -11,8 +11,8 @@ install_kubewarden_core() {
   helm repo add kubewarden https://charts.kubewarden.io
   helm repo update
 
-  helm install -n kubewarden kubewarden-crds kubewarden/kubewarden-crds
-  helm install --wait -n kubewarden kubewarden-controller kubewarden/kubewarden-controller
+  helm install -n kubewarden kubewarden-crds ./instruqt-vms/assets/charts/kubewarden-crds-$KUBEWARDEN_CRDS_VERSION.tgz
+  helm install --wait -n kubewarden kubewarden-controller ./instruqt-vms/assets/charts/kubewarden-controller-$KUBEWARDEN_CONTROLLER_VERSION.tgz
 }
 
 install_kubewarden_defaults() {
@@ -25,5 +25,5 @@ install_kubewarden_defaults() {
   fi
 
   kubectl create secret docker-registry suse-application-collection --docker-server=dp.apps.rancher.io --docker-username=${appco_username} --docker-password=${appco_token} -n kubewarden
-  helm upgrade -i --wait --namespace kubewarden --create-namespace kubewarden-defaults kubewarden/kubewarden-defaults --reuse-values --set policyServer.imagePullSecret=suse-application-collection
+  helm upgrade -i --wait --namespace kubewarden --create-namespace kubewarden-defaults ./instruqt-vms/assets/charts/kubewarden-defaults-$KUBEWARDEN_DEFAULTS_VERSION.tgz --reuse-values --set policyServer.imagePullSecret=suse-application-collection
 }
