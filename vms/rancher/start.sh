@@ -59,10 +59,10 @@ if [ "${USE_INSTRUQT_SSL_CERTIFICATE:-false}" == "true" ]; then
   k8s_install_sprouter
   k8s_create_wildcardtlssecret sandbox.crt sandbox.key wildcard-tls
   kubernetes_wait_resource_ready "secret" "wildcard-tls" "cattle-system"
-  rancher_create_ingress "traefik" "${RANCHER_DOMAIN}" "none" "wildcard-tls"
+  rancher_create_ingress "nginx" "${RANCHER_DOMAIN}" "none" "wildcard-tls"
 else
   echo ">>> Using Cert-Manager provided SSL certificate"
-  rancher_create_ingress "traefik" "${RANCHER_DOMAIN}" "letsencrypt-prod" "rancher-tls"
+  rancher_create_ingress "nginx" "${RANCHER_DOMAIN}" "letsencrypt-prod" "rancher-tls"
   # Wait until certificate to exist (can't use kubectl because the cert is not present yet)
   kubernetes_wait_resource_ready "certificate" "rancher-tls" "cattle-system"
 
