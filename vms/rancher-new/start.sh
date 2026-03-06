@@ -47,6 +47,9 @@ done
 echo ">>> Waiting for cert-manager to be ready"
 kubectl wait --for=condition=Ready pod -l app.kubernetes.io/instance=cert-manager -n cert-manager --timeout=300s
 
+kubectl wait --for=condition=Ready pod -l app.kubernetes.io/name=traefik -n traefik --timeout=300s
+
+
 echo ">>> Recreating Rancher Ingress"
 kubectl delete ingress rancher -n cattle-system --ignore-not-found
 

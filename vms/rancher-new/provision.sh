@@ -21,16 +21,16 @@ install_tooling "${K9S_VERSION}"
 echo ">> Increase limits"
 increase_limits
 echo ">> Setup k3s"
-k3s_create_cluster "${K3S_VERSION}" "rancher-master"
+k3s_create_cluster "v1.34.4+k3s1" "rancher-master"
 k3s_copy_kubeconfig
 echo ">> Install Traefik"
 k8s_install_traefik "${TRAEFIK_VERSION}"
 echo ">> Install cert-manager"
-k8s_install_certmanager "${CERTMANAGER_VERSION}"
+k8s_install_certmanager "v1.19.4"
 k8s_create_letsencryptclusterissuer "traefik" "${LETSENCRYPT_EMAIL_ADDRESS}"
 
 echo ">> Install Rancher"
-rancherprime_install_withcertmanagerclusterissuer "${RANCHER_VERSION}" "rancher.test.host" false
+rancherprime_install_withcertmanagerclusterissuer "2.13.2" "rancher.test.host" false
 
 echo ">> Add completions"
 add_completions

@@ -6,5 +6,5 @@ install_tooling() {
     zypper in -y helm jq git
 
     # support tools
-    rpm -Uvh https://github.com/derailed/k9s/releases/download/${k9s_version}/k9s_linux_amd64.rpm
+    zypper in -y --allow-unsigned-rpm https://github.com/derailed/k9s/releases/download/${k9s_version}/k9s_linux_amd64.rpm
 }

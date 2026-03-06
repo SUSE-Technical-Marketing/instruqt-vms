@@ -71,8 +71,10 @@ rancher_update_password() {
   local retry_count=0
   local http_code
   local response_body
+  local last_http_code=0
 
   echo 'Updates Rancher user password...'
+  sleep 5 # Sleep a bit to avoid hitting "too many requests" if this is called immediately after first login
 
   while [ $retry_count -lt $max_retries ]; do
     # Use -w to capture HTTP status code separately from response body
@@ -96,6 +98,14 @@ rancher_update_password() {
       return 0
     fi
 
+    if [ "$last_http_code" == "503" ] && [ "$http_code" == "401"  ]; then
+      echo "Unauthorized (401) - likely due to token invalidation after password change. Stopping retries." >&2
+      return 0
+    elif [ "$http_code" == "422" ]; then
+      echo "Unprocessable Entity (422) - Don't know, let's try." >&2
+      return 0
+    fi
+
     retry_count=$((retry_count + 1))
     if [ $retry_count -lt $max_retries ]; then
       echo "Password update attempt $retry_count failed with HTTP $http_code, retrying..." >&2
@@ -103,6 +113,7 @@ rancher_update_password() {
       if echo "$response_body" | jq -e '.code' >/dev/null 2>&1; then
         echo "Error: $(echo "$response_body" | jq -r '.message // .code')" >&2
       fi
+      last_http_code=$http_code
       sleep 2
     fi
   done
