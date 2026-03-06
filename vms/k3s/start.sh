@@ -44,3 +44,10 @@ done
 
 echo "Waiting for rancher-webhook deployment to be ready..."
 kubectl wait --for=condition=Available --timeout=300s deployment/rancher-webhook -n cattle-system
+
+if [ "${USE_INSTRUQT_SSL_CERTIFICATE:-false}" == "true" ]; then
+  echo ">>> Using Instruqt provided SSL certificate"
+  download_gcp_certificate sandbox.crt sandbox.key
+  k8s_install_sprouter
+  k8s_create_wildcardtlssecret sandbox.crt sandbox.key wildcard-tls
+fi

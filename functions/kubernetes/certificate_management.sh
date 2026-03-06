@@ -103,3 +103,20 @@ EOF
   kubectl wait --for=condition=Ready clusterissuer/letsencrypt-staging --timeout=60s
   kubectl wait --for=condition=Ready clusterissuer/letsencrypt-prod --timeout=60s
 }
+
+kubernetes_wait_resource_ready() {
+  local resourceType=$1
+  local resourceName=$2
+  local namespace=${3:-default}
+
+  echo ">>> Waiting for ${resourceType} ${resourceName} in namespace ${namespace} to be ready"
+  for i in {1..60}; do
+    if kubectl get ${resourceType} ${resourceName} -n ${namespace} &>/dev/null; then
+      echo "${resourceType} ${resourceName} is ready"
+      break
+    fi
+    echo "Waiting for ${resourceType} ${resourceName} to be ready..."
+    sleep 5
+  done
+
+}
