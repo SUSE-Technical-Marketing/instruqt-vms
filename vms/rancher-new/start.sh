@@ -79,6 +79,9 @@ fi
 echo ">>> Waiting for Rancher deployment to be ready"
 kubectl wait --for=condition=Available deployment/rancher -n cattle-system --timeout=300s
 
+echo ">>> Waiting for rancher-webhook deployment to be ready..."
+# kubectl wait --for=condition=Available --timeout=300s deployment/rancher-webhook -n cattle-system
+
 rancher_first_login $RANCHER_URL "$RANCHER_ADMIN_PASSWORD"
 export RANCHER_BEARER_TOKEN=$(rancher_login_withpassword $RANCHER_URL $RANCHER_ADMIN "$RANCHER_ADMIN_PASSWORD")
 
