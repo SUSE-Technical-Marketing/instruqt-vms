@@ -1,8 +1,11 @@
 install_sbom_scanner() {
+    local cnpg_version="${1:-0.27.1}"
+    local sbom_scanner_version="${2:-0.10.0}"
     echo ">> Install Cloud Native Postgres Operator"
     helm repo add cnpg https://cloudnative-pg.github.io/charts
     helm repo update
     helm install cnpg \
+    --version "$cnpg_version" \
     --namespace cnpg-system \
     --create-namespace \
     --wait \
@@ -12,6 +15,7 @@ install_sbom_scanner() {
     helm repo add kubewarden https://charts.kubewarden.io
     helm repo update
     helm install sbomscanner kubewarden/sbomscanner \
+    --version "$sbom_scanner_version" \
     --namespace sbomscanner \
     --create-namespace \
     --set controller.replicas=1 \
