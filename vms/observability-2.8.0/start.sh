@@ -55,7 +55,7 @@ else
   observability_generate_values_new "${OBSERVABILITY_LICENSE}" "${OBSERVABILITY_HOST}" "${OBSERVABILITY_ADMIN_PASSWORD}" "${OBSERVABILITY_SERVICE_TOKEN}" "letsencrypt-prod" "tls-secret" "traefik"
 fi
 
-observability_install_server_new $OBSERVABILITY_VERSION true
+observability_install_server_new "2.8.0" true
 if [ $? -ne 0 ]; then
   kubectl get pods -n suse-observability
   fail-message "Failed to wait for observability pods to be ready."
