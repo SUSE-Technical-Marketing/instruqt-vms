@@ -15,6 +15,8 @@ spec:
   gitBranch: gh-pages
 EOF
 
+  kubectl wait --for=condition=Downloaded clusterrepo/liz-ui-plugins --timeout=120s
+
   curl -sSL $curl_extras $rancher_url/v1/catalog.cattle.io.clusterrepos/liz-ui-plugins?action=install \
     -X POST \
     -H "Authorization: Bearer $bearer_token" \
