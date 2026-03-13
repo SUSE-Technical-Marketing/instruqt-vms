@@ -15,14 +15,30 @@ spec:
   gitBranch: gh-pages
 EOF
 
+  echo ">>> Waiting for Liz UI ClusterRepo to be downloaded"
   kubectl wait --for=condition=Downloaded clusterrepo/liz-ui-plugins --timeout=120s
 
-  curl -sSL $curl_extras $rancher_url/v1/catalog.cattle.io.clusterrepos/liz-ui-plugins?action=install \
+  echo ">>> Installing Rancher AI UI from ClusterRepo"
+  curl -sSL $rancher_url/v1/catalog.cattle.io.clusterrepos/liz-ui-plugins?action=install \
     -X POST \
     -H "Authorization: Bearer $bearer_token" \
-    -d '{"charts":[{"chartName":"rancher-ai-ui","version":"'"$version"'","releaseName":"rancher-ai-ui","annotations":{},"values":{}}],"namespace":"cattle-ui-plugin-system"}'
+    -d - <<EOF
+{
+  "charts": [
+    {
+      "chartName":"rancher-ai-ui",
+      "version":"$version",
+      "releaseName":"rancher-ai-ui",
+      "annotations":{},
+      "values":{}
+    }
+  ],
+  "namespace":"cattle-ui-plugin-system"
+}
+EOF
   if [ $? -ne 0 ]; then
     echo "ERROR: Failed to install Liz UI"
     exit 1
   fi
+  echo ">>> Successfully installed Liz UI"
 }
