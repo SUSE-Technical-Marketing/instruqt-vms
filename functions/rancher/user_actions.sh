@@ -102,8 +102,20 @@ rancher_update_password() {
       echo "Unauthorized (401) - likely due to token invalidation after password change. Stopping retries." >&2
       return 0
     elif [ "$http_code" == "422" ]; then
-      echo "Unprocessable Entity (422) - Don't know, let's try." >&2
-      return 0
+      # 422 may mean token was invalidated - try to get a fresh token with bootstrap password
+      echo "Got 422 (Unprocessable Entity) - re-authenticating with bootstrap password..." >&2
+      local fresh_token
+      fresh_token=$(rancher_login_withpassword "$rancherUrl" "admin" "$currentPassword" 2>/dev/null)
+      if [ -n "$fresh_token" ] && [ "$fresh_token" != "null" ]; then
+        echo "Re-authentication successful, retrying password change with fresh token..." >&2
+        token="$fresh_token"
+        # Don't increment retry_count, just continue the loop with new token
+        sleep 2
+        continue
+      else
+        echo "Re-authentication with bootstrap password failed - password may already be changed." >&2
+        return 1
+      fi
     fi
 
     retry_count=$((retry_count + 1))
