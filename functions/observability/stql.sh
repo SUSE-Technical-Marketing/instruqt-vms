@@ -40,6 +40,7 @@ observability_get_component_snapshot() {
     local req
     req=$(cat <<EOF
 {
+  "_type": "SnapshotRequest",
   "queryVersion": "1.0",
   "metadata":     {
     "groupingEnabled":       false,
@@ -57,5 +58,6 @@ observability_get_component_snapshot() {
 EOF
 )
     req=$(echo $req | jq --arg stql "$stql" '.query = "\($stql)"')
-    curl -s -k -H "Authorization: ApiKey $service_token" -H "Content-Type: application/json" -X POST -d "$req" $url/api/snapshot
+    curl -s -k -H "X-API-Key: $service_token" -H "Content-Type: application/json" -X POST -d "$req" $url/api/snapshot
+ #   curl -s -k -H "Authorization: ServiceToken $service_token" -H "Content-Type: application/json" -X POST -d "$req" $url/api/snapshot
 }
