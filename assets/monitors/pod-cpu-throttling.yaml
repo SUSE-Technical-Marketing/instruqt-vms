@@ -7,7 +7,7 @@ nodes:
       aliasTemplate: CPU Throttling for ${container} of ${pod_name}
       query: 100 * sum by (cluster_name, namespace, pod_name, container) (container_cpu_throttled_periods{}) / sum by (cluster_name, namespace, pod_name, container) (container_cpu_elapsed_periods{})
       unit: percent
-    threshold: 80.0
+    threshold: 75.0
     urnTemplate: urn:kubernetes:/${cluster_name}:${namespace}:pod/${pod_name}
   description: |-
     This monitor continuously checks if any pod reaches its CPU throttling
@@ -24,7 +24,7 @@ nodes:
 
     On the [pod metrics page](/#/components/\{{ componentUrnForUrl \}}/metrics) you will find the CPU Usage and CPU Throttling charts.
 
-    #### CPU Trottling
+    #### CPU Throttling
 
     The percentage of CPU throttling over time. CPU throttling occurs when a container reaches its CPU limit, restricting its CPU usage to
     prevent it from exceeding the specified limit. The higher the percentage, the more throttling is occurring, which means the container's
@@ -48,10 +48,10 @@ nodes:
 
     ### Adjust CPU Requests and Limits
 
-    On the [pod highlights page](/#/components/\{{ componentUrnForUrl \}}/highlights) and checking whether a `Deployment` event happened recently after which the cpu usage behaviour changed.
+    On the [pod highlights page](/#/components/\{{ componentUrnForUrl \}}/highlights) and checking whether a `Deployment` event happened recently after which the CPU usage behaviour changed.
 
-    You can investigate which change led to the cpu throttling by checking the [Show last change](/#/components/\{{ componentUrnForUrl \}}#lastChange),
-    which will highlight the latest changeset for the deployment. You can then revert the change or fix the cpu request and limit.
+    You can investigate which change led to the CPU throttling by checking the [Show last change](/#/components/\{{ componentUrnForUrl \}}#lastChange),
+    which will highlight the latest changeset for the deployment. You can then revert the change or fix the CPU request and limit.
 
 
     Review the pod's resource requests and limits to ensure they are set appropriately.
