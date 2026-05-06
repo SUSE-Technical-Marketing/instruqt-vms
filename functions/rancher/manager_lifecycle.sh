@@ -11,7 +11,8 @@ rancherprime_install() {
     --version ${version} \
     --set replicas=1 \
     --set hostname=${hostname} \
-    --set agentTLSMode="system-store"
+    --set agentTLSMode="system-store" \
+    --set ingress.tls.source=secret
   kubectl wait pods -n cattle-system -l app=rancher --for condition=Ready --timeout=180s
 }
 
