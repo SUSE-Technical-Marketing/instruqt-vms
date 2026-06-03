@@ -1,0 +1,9 @@
+curl -SsL https://raw.githubusercontent.com/SUSE-Technical-Marketing/instruqt-vms/refs/heads/rancher-2.13/provision.sh | GIT_REVISION=refs/heads/rancher-2.13 REG_CODE="INTERNAL-USE-ONLY-b9fa-a332" MACHINE="rancher" sh -
+
+curl -SsL https://raw.githubusercontent.com/SUSE-Technical-Marketing/instruqt-vms/refs/heads/rancher-2.13/provision.sh | GIT_REVISION=refs/heads/rancher-2.13 REG_CODE="INTERNAL-USE-ONLY-b9fa-a332" MACHINE="observability" sh -
+
+curl -SsL https://raw.githubusercontent.com/SUSE-Technical-Marketing/instruqt-vms/refs/heads/rdeu26-new/provision.sh | GIT_REVISION=refs/heads/rancher-2.13 REG_CODE="INTERNAL-USE-ONLY-b9fa-a332" MACHINE="rancher-new" sh -
+
+curl -SsL https://raw.githubusercontent.com/SUSE-Technical-Marketing/instruqt-vms/refs/heads/rdeu26-new/provision.sh | GIT_REVISION=refs/heads/rdeu26-new REG_CODE="INTERNAL-USE-ONLY-b9fa-a332" MACHINE="rancher-new" sh -
+curl -SsL https://raw.githubusercontent.com/SUSE-Technical-Marketing/instruqt-vms/refs/heads/rdeu26-new/provision.sh | GIT_REVISION=refs/heads/rdeu26-new REG_CODE="INTERNAL-USE-ONLY-b9fa-a332" MACHINE="k3s-1-34" sh -
+curl -SsL https://raw.githubusercontent.com/SUSE-Technical-Marketing/instruqt-vms/refs/heads/rdeu26-new/provision.sh | GIT_REVISION=refs/heads/rdeu26-new REG_CODE="INTERNAL-USE-ONLY-b9fa-a332" MACHINE="observability-2.8.0" sh -

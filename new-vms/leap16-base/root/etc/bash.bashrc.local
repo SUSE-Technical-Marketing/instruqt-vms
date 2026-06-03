@@ -1,0 +1,14 @@
+# System-wide Bash aliases and login commands
+alias ll='ls -la'
+alias la='ls -A'
+alias l='ls -CF'
+alias k='kubectl'
+
+if [[ $- == *i* ]]; then
+    # Clear screen and show fastfetch on every new shell
+    clear
+    fastfetch
+fi
+
+# Set KUBECONFIG for all users
+export KUBECONFIG=/etc/rancher/rke2/rke2.yaml:/etc/rancher/k3s/k3s.yaml

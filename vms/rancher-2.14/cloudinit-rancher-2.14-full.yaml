@@ -1,0 +1,135 @@
+apiVersion: v1
+data:
+  cloudInit: |
+    #cloud-config
+    output: {}
+    package_update: true
+    write_files:
+      - path: /etc/rancher/k3s/config.yaml
+        permissions: "0644"
+        content: |-
+          write-kubeconfig-mode: "0644"
+      - path: /tmp/install-k3s.sh
+        permissions: "0755"
+        content: |-
+          #!/bin/bash
+          set -e
+          curl -sfL https://get.k3s.io -o get-k3s.sh
+          INSTALL_K3S_EXEC="--disable=traefik --disable-network-policy" K3S_NODE_NAME="rancher-master" INSTALL_K3S_SKIP_START=true INSTALL_K3S_SKIP_ENABLE=true INSTALL_K3S_CHANNEL="v1.35.4+k3s1" sh get-k3s.sh
+      - path: /etc/modules-load.d/iscsi.conf
+        content: |
+          iscsi_tcp
+      - path: /etc/zypp/repos.d/openSUSE-Leap-16.0-Oss.repo
+        permissions: "0644"
+        content: |-
+          [repo-oss]
+          name=repo-oss (16.0)
+          enabled=1
+          autorefresh=1
+          baseurl=http://download.opensuse.org/distribution/leap/16.0/repo/oss/
+          type=rpm-md
+          gpgcheck=1
+          gpgkey=http://download.opensuse.org/distribution/leap/16.0/repo/oss/repodata/repomd.xml.key
+      - path: /etc/zypp/repos.d/devel-kubic.repo
+        permissions: "0644"
+        content: |-
+          [devel-kubic]
+          name=devel-kubic (16.0)
+          enabled=1
+          autorefresh=1
+          baseurl=http://download.opensuse.org/repositories/devel:kubic/16.0/
+          type=rpm-md
+          gpgcheck=0
+      - path: /etc/bash.bashrc.local
+        permissions: "0644"
+        content: |-
+          # System-wide Bash aliases and login commands
+          alias ll='ls -la'
+          alias la='ls -A'
+          alias l='ls -CF'
+          alias k='kubectl'
+          if [[ $- == *i* ]]; then
+             # Clear screen and show fastfetch on every new shell
+             clear
+             fastfetch
+          fi
+          # Set KUBECONFIG for all users
+          export KUBECONFIG=/etc/rancher/rke2/rke2.yaml:/etc/rancher/k3s/k3s.yaml
+      - path: /etc/sysctl.d/99-disable-ipv6.conf
+        permissions: "0644"
+        content: |-
+          net.ipv6.conf.all.disable_ipv6 = 1
+          net.ipv6.conf.default.disable_ipv6 = 1
+          net.ipv6.conf.lo.disable_ipv6 = 1
+    bootcmd:
+      - sysctl -w net.ipv6.conf.all.disable_ipv6=1
+      - sysctl -w net.ipv6.conf.default.disable_ipv6=1
+    chpasswd:
+      expire: false
+      users:
+        - name: jeroen
+          password: $2y$10$M8ZamcBlJG4xMooQSI7M2eAy2vrDrFx4WOG79SrPKjZUU/kDpsRE6
+    runcmd:
+      - "firewall-cmd --permanent --add-port=6443/tcp #apiserver"
+      - "firewall-cmd --permanent --zone=trusted --add-source=10.42.0.0/16 #pods"
+      - "firewall-cmd --permanent --zone=trusted --add-source=10.43.0.0/16 #services"
+      - firewall-cmd --reload
+      - "sysctl -p /etc/sysctl.d/99-disable-ipv6.conf                 # Disable IPv6"
+      - echo 'fs.inotify.max_user_instances = 1024' >> /etc/sysctl.conf
+      - echo 'fs.inotify.max_user_watches = 524288' >> /etc/sysctl.conf
+      - sysctl -p
+      - systemctl enable --now --no-block iscsid.service
+      - systemctl enable --now qemu-guest-agent.service
+      - /tmp/install-k3s.sh
+      - restorecon -Rv /usr/local/bin/k3s /usr/local/bin/crictl /usr/local/bin/ctr
+      - systemctl enable --now k3s.service
+      - export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
+      - git clone https://github.com/suse-technical-marketing/instruqt-vms /tmp/instruqt-vms
+      - source /tmp/instruqt-vms/functions/index.sh
+      - wait_for_kubernetes
+      - k8s_install_traefik "v39.0.9"
+      - rancherprime_install "2.14.1"
+      - add_completions
+    packages:
+      - kernel-default
+      - firewalld
+      - k3s-selinux
+      - fastfetch
+      - curl
+      - helm
+      - git-core
+      - bash-completion
+      - vim
+      - nano
+      - iputils
+      - wget
+      - mc
+      - tree
+      - btop
+      - kubernetes-client
+      - helm
+      - k9s
+      - cloud-init
+      - open-iscsi
+      - cryptsetup
+      - qemu-guest-agent
+    users:
+      - default
+      - name: jeroen
+        sudo:
+          - ALL=(ALL) NOPASSWD:ALL
+        ssh_authorized_keys:
+          - ssh-ed25519
+            AAAAC3NzaC1lZDI1NTE5AAAAIBSE68VYUiwL5a8xcmv34RZ1OYnrEcRBe4NaeKpE/twU
+            jeroen@hierynomus.com
+        shell: /bin/bash
+    ssh_authorized_keys:
+      - ssh-ed25519
+        AAAAC3NzaC1lZDI1NTE5AAAAIBSE68VYUiwL5a8xcmv34RZ1OYnrEcRBe4NaeKpE/twU
+        jeroen@hierynomus.com
+kind: ConfigMap
+metadata:
+  labels:
+    harvesterhci.io/cloud-init-template: user
+  name: rancher-2-14
+  namespace: default

@@ -1,0 +1,7 @@
+[cloud-tools]
+name=Cloud:Tools (16.0)
+enabled=1
+autorefresh=1
+baseurl=https://download.opensuse.org/repositories/Cloud:/Tools/16.0/
+type=rpm-md
+gpgcheck=1

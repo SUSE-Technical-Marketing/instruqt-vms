@@ -1,0 +1,7 @@
+[devel-kubic]
+name=devel-kubic (16.0)
+enabled=1
+autorefresh=1
+baseurl=http://download.opensuse.org/repositories/devel:kubic/16.0/
+type=rpm-md
+gpgcheck=0

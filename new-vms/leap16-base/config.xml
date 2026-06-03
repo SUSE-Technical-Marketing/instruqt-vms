@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="utf-8"?>
+<image schemaversion="7.6" name="leap16-base">
+  <description type="system">
+    <author>Jeroen Hierynomus</author>
+    <contact>jeroen@hierynomus.com</contact>
+    <specification>openSUSE Leap 16.0 base image for Harvester VMs</specification>
+  </description>
+
+  <preferences>
+    <version>1.0.0</version>
+    <packagemanager>zypper</packagemanager>
+    <locale>en_US</locale>
+    <keytable>us</keytable>
+    <timezone>Europe/Amsterdam</timezone>
+    <rpm-excludedocs>true</rpm-excludedocs>
+    <rpm-check-signatures>false</rpm-check-signatures>
+    <type
+      image="oem"
+      filesystem="btrfs"
+      kernelcmdline="console=ttyS0 console=tty0 net.ifnames=1"
+      bootpartition="false"
+      disk_start_sector="2048"
+      firmware="uefi"
+      efipartsize="512"
+      efiparttable="gpt"
+      format="qcow2"
+    >
+      <oemconfig>
+        <oem-resize>true</oem-resize>
+        <oem-swap>false</oem-swap>
+        <oem-skip-verify>true</oem-skip-verify>
+      </oemconfig>
+      <bootloader name="grub2" console="serial" timeout="3"/>
+      <size unit="G">8</size>
+    </type>
+  </preferences>
+
+  <!-- OSS main repository - includes updates in Leap 16 -->
+  <repository type="rpm-md" alias="repo-oss" priority="99">
+    <source path="http://download.opensuse.org/distribution/leap/16.0/repo/oss/"/>
+  </repository>
+
+  <!-- devel:kubic for k3s-selinux, k9s, kubernetes-client -->
+  <repository type="rpm-md" alias="devel-kubic" priority="99">
+    <source path="http://download.opensuse.org/repositories/devel:kubic/16.0/"/>
+  </repository>
+
+  <packages type="bootstrap">
+    <package name="gawk"/>
+    <package name="grep"/>
+    <package name="gzip"/>
+    <package name="udev"/>
+    <package name="xz"/>
+    <package name="shadow"/>
+    <package name="filesystem"/>
+    <package name="glibc-locale-base"/>
+    <package name="ca-certificates-mozilla"/>
+    <package name="openSUSE-repos-Leap"/>
+  </packages>
+
+  <packages type="image">
+    <!-- Kernel - full, not base, to get all modules including iscsi_tcp -->
+    <package name="kernel-default"/>
+    <ignore name="kernel-default-base"/>
+
+    <!-- Bootloader -->
+    <package name="grub2"/>
+    <package name="grub2-x86_64-efi"/>
+    <package name="shim"/>
+
+    <!-- Cloud & VM -->
+    <package name="NetworkManager"/>
+    <package name="cloud-init"/>
+    <package name="cloud-init-config-suse"/>
+    <package name="qemu-guest-agent"/>
+
+    <!-- Security -->
+    <package name="firewalld"/>
+    <package name="k3s-selinux"/>
+
+    <!-- Storage -->
+    <package name="open-iscsi"/>
+    <package name="cryptsetup"/>
+
+    <!-- Networking -->
+    <package name="iputils"/>
+    <package name="wget"/>
+    <package name="curl"/>
+
+    <!-- Shell & tools -->
+    <package name="bash-completion"/>
+    <package name="vim"/>
+    <package name="nano"/>
+    <package name="git-core"/>
+    <package name="tree"/>
+    <package name="mc"/>
+    <package name="btop"/>
+    <package name="fastfetch"/>
+
+    <!-- Kubernetes tooling -->
+    <package name="kubernetes-client"/>
+    <package name="helm"/>
+    <package name="k9s"/>
+
+    <!-- OEM first-boot resize support -->
+    <package name="dracut"/>
+    <package name="dracut-kiwi-oem-repart"/>
+
+    <!-- Misc -->
+    <package name="timezone"/>
+    <package name="systemd"/>
+    <package name="which"/>
+    <package name="less"/>
+    <package name="tar"/>
+  </packages>
+
+
+  <users>
+    <user
+      name="root"
+      groups="root"
+      home="/root"
+      shell="/bin/bash"
+      password="$2y$10$M8ZamcBlJG4xMooQSI7M2eAy2vrDrFx4WOG79SrPKjZUU/kDpsRE6"
+      pwdformat="encrypted"
+    />
+    <user
+      name="jeroen"
+      groups="users,wheel"
+      home="/home/jeroen"
+      shell="/bin/bash"
+      password="$2y$10$M8ZamcBlJG4xMooQSI7M2eAy2vrDrFx4WOG79SrPKjZUU/kDpsRE6"
+      pwdformat="encrypted"
+    />
+  </users>
+
+</image>

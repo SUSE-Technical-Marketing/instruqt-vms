@@ -1,0 +1,59 @@
+apiVersion: v1
+data:
+  cloudInit: |
+    #cloud-config
+    output: {}
+    package_update: true
+    write_files:
+      - path: /tmp/install-k3s.sh
+        permissions: "0755"
+        content: |-
+          #!/bin/bash
+          set -e
+          curl -sfL https://get.k3s.io -o get-k3s.sh
+          INSTALL_K3S_EXEC="--disable=traefik --disable-network-policy" K3S_NODE_NAME="rancher-master" INSTALL_K3S_SKIP_START=true INSTALL_K3S_SKIP_ENABLE=true INSTALL_K3S_CHANNEL="v1.35.4+k3s1" sh get-k3s.sh
+      - path: /tmp/zero-fill.sh
+        permissions: "0755"
+        content: |-
+          #!/bin/bash
+          set -e
+          dd if=/dev/zero of=/zero-fill bs=1M || true
+          rm -f /zero-fill
+          sync
+      - path: /tmp/seal-image.sh
+        permissions: "0755"
+        content: |-
+          #!/bin/bash
+          # Stop k3s
+          k3s-killall.sh
+          rm -rf /var/lib/rancher/k3s/server/tls/
+          rm -rf /var/lib/rancher/k3s/server/cred/
+          rm -rf /var/lib/rancher/k3s/server/db/
+          rm -rf /var/lib/rancher/k3s/agent/
+          # Reset cloud-init
+          cloud-init clean --logs --seed --configs all
+          # Remove machine identity
+          rm -f /etc/machine-id
+          rm -f /var/lib/dbus/machine-id
+          truncate -s 0 /etc/hostname
+          # Power off - pipeline detects completion by VM reaching Stopped state
+          systemctl poweroff
+    runcmd:
+      - /tmp/install-k3s.sh
+      - restorecon -Rv /usr/local/bin/k3s /usr/local/bin/crictl /usr/local/bin/ctr
+      - systemctl enable --now k3s.service
+      - export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
+      - git clone https://github.com/suse-technical-marketing/instruqt-vms /root/instruqt-vms
+      - source /root/instruqt-vms/functions/index.sh
+      - wait_for_kubernetes
+      - k8s_install_traefik "v39.0.9"
+      - rancherprime_install "2.14.1"
+      - add_completions
+      - /tmp/zero-fill.sh
+      - /tmp/seal-image.sh
+kind: ConfigMap
+metadata:
+  labels:
+    harvesterhci.io/cloud-init-template: user
+  name: rancher-2-14
+  namespace: default
